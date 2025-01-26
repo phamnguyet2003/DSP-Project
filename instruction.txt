@@ -1,0 +1,79 @@
+1. Active môi trường ảo
+    myenv\Scripts\activate
+
+2. Cài đặt thư viện 
+'''
+# Cài đặt Django
+pip install django
+
+# Tạo một project mới
+django-admin startproject tts_project
+
+# Tạo một app mới trong project
+cd tts_project
+python manage.py startapp users
+
+python manage.py makemigrations
+python manage.py migrate
+python manage.py runserver 8888
+
+admin-loncongaycom
+'''
+
+3. Add thêm Package
+# Tạo một bản ghi mới
+new_package = Package(
+    price=0,
+    name="Free Package",
+    number_of_works=500,
+    tts="Text-to-Speech features for premium users",
+    language="Vietnamese",
+)
+
+# Lưu bản ghi vào cơ sở dữ liệu
+new_package.save()
+
+                '''packages = [
+                    Package(
+                        price=199.99,
+                        name="Basic Package",
+                        duration=30,
+                        number_of_works=50,
+                        tts="Text-to-Speech for basic users",
+                        language="English",
+                        voice="female",
+                        advanced_customization=False,
+                        no_ad=True,
+                        cloud_storage=10
+                    ),
+                    Package(
+                        price=299.99,
+                        name="Premium Package",
+                        duration=60,
+                        number_of_works=100,
+                        tts="Text-to-Speech for premium users",
+                        language="English",
+                        voice="male",
+                        advanced_customization=True,
+                        no_ad=True,
+                        cloud_storage=50
+                    ),
+                    Package(
+                        price=399.99,
+                        name="Ultimate Package",
+                        duration=90,
+                        number_of_works=150,
+                        tts="Text-to-Speech for ultimate users",
+                        language="Spanish",
+                        voice="male",
+                        advanced_customization=True,
+                        no_ad=False,
+                        cloud_storage=100
+                    )
+                ]
+
+                # Sử dụng bulk_create để lưu nhiều bản ghi cùng lúc
+                Package.objects.bulk_create(packages)
+                '''
+
+
