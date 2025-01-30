@@ -13,35 +13,35 @@ from datetime import timedelta
 
 # Create your views here.
 def get_home(request):
-    username = request.user.username
+    username = request.user.name
     return render(request, 'home.html', {'username':username})
 
 def get_payments(request): # mua gói cước
-    username = request.user.username
+    username = request.user.name
     return render(request, 'payments.html', {'username':username})
 
 def get_index(request): # giao diện để dùng tool
-    username = request.user.username
+    username = request.user.name
     return render(request, 'index.html', {'username':username})
 
 def get_money(request): # nạp tiền
-    username = request.user.username
+    username = request.user.name
     return render(request, 'money.html', {'username':username})
 
-def get_profile(request):
-    username = request.user.username
+def get_profile(request): # trang cá nhân
+    username = request.user.name
     return render(request, 'profile.html', {'username':username})
 
 def get_instruction(request): # HDSD
-    username = request.user.username
+    username = request.user.name
     return render(request, 'instruction.html', {'username':username})
 
-def get_history_use(request): # HDSD
-    username = request.user.username
+def get_history_use(request): # lịch sử dùng
+    username = request.user.name
     return render(request, 'history_use.html', {'username':username})
 
-def get_history_buy(request): # HDSD
-    username = request.user.username
+def get_history_buy(request): # lịch sử mua
+    username = request.user.name
     return render(request, 'history_buy.html', {'username':username})
 
 # Hàm đăng ký người dùng

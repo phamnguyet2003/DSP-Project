@@ -1,11 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.utils.timezone import now
 
 # Customer model: Lưu thông tin khách hàng
 class Customer(AbstractUser):
     name = models.CharField(max_length=150, blank=True, null=True)  # Thêm blank=True, null=True để tránh lỗi bắt buộc
     phone = models.CharField(max_length=15, blank=True, null=True)
-
+    money = models.IntegerField(default=0)
     REQUIRED_FIELDS = ['name', 'phone']
     def __str__(self):
         return self.username 
@@ -64,8 +65,9 @@ class History(models.Model):
 # Wallet model: Lưu số dư ví của khách hàng
 class Wallet(models.Model):
     customer = models.OneToOneField(Customer, on_delete=models.CASCADE)
+    transaction_date = models.DateTimeField(default=now)  # Thêm default=now
     value = models.DecimalField(max_digits=10, decimal_places=2)
-    old_value = models.DecimalField(max_digits=10, decimal_places=2)
+    total = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
         return f"Wallet for {self.customer.name}"

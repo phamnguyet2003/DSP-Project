@@ -2,126 +2,50 @@
 {% load static %}
 {% block main-content %}
 <main class="main">
-
   <!-- Portfolio Section -->
   <section id="portfolio" class="portfolio section">
-
     <!-- Section Title -->
-    <div class="container section-title" data-aos="fade-up">
-      <h2>Portfolio</h2>
-      <p>Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p>
+    <div class="container section-title text-center" data-aos="fade-up">
+      <h2>Nạp tiền vào tài khoản</h2>
+      <p>Vui lòng chờ 2-5 phút để chúng tôi xác nhận.</p>
     </div><!-- End Section Title -->
 
     <div class="container">
-
-      <div class="isotope-layout" data-default-filter="*" data-layout="masonry" data-sort="original-order">
-
-        <ul class="portfolio-filters isotope-filters" data-aos="fade-up" data-aos-delay="100">
-          <li data-filter="*" class="filter-active">All</li>
-          <li data-filter=".filter-app">App</li>
-          <li data-filter=".filter-product">Card</li>
-          <li data-filter=".filter-branding">Web</li>
+      <div class="isotope-layout" data-default-filter=".filter-qr" data-layout="masonry" data-sort="original-order">
+        <ul class="portfolio-filters isotope-filters d-flex justify-content-center" data-aos="fade-up" data-aos-delay="100">
+          <li data-filter=".filter-qr" class="filter-active">QR Code</li>
+          <li data-filter=".filter-bank">Số tài khoản</li>
         </ul><!-- End Portfolio Filters -->
 
-        <div class="row gy-4 isotope-container" data-aos="fade-up" data-aos-delay="200">
+        <div class="d-flex justify-content-center">
+          <div class="row gy-4 isotope-container text-center" data-aos="fade-up" data-aos-delay="200" style="width: 100%; max-width: 600px;">
+            
+            <!-- Hiển thị QR Code -->
+            <div class="col-12 portfolio-item isotope-item filter-qr">
+              <img src="{% static '\assets\img\qr_code\qr_code.jpg' %}" class="img-fluid mb-3" alt="QR Code Thanh Toán" width="300">
+              <p>Vui lòng quét mã QR để chuyển khoản và nhập nội dung thanh toán là <strong>{{ user.username }}</strong></p>
+              <p>Liên lạc qua các kênh <a href="https://www.facebook.com/nguyetpham.19.2/" target="_blank">Facebook</a> hoặc <a href="https://zalo.me/0944510943" target="_blank">Zalo</a> để được hỗ trợ.</p>
 
-          <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-app">
-            <img src="assets/img/masonry-portfolio/masonry-portfolio-1.jpg" class="img-fluid" alt="">
-            <div class="portfolio-info">
-              <h4>App 1</h4>
-              <p>Lorem ipsum, dolor sit</p>
-              <a href="assets/img/masonry-portfolio/masonry-portfolio-1.jpg" title="App 1" data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
-              <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
-            </div>
-          </div><!-- End Portfolio Item -->
+            </div><!-- End QR Code Item -->
 
-          <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-product">
-            <img src="assets/img/masonry-portfolio/masonry-portfolio-2.jpg" class="img-fluid" alt="">
-            <div class="portfolio-info">
-              <h4>Product 1</h4>
-              <p>Lorem ipsum, dolor sit</p>
-              <a href="assets/img/masonry-portfolio/masonry-portfolio-2.jpg" title="Product 1" data-gallery="portfolio-gallery-product" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
-              <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
-            </div>
-          </div><!-- End Portfolio Item -->
+            <!-- Hiển thị thông tin tài khoản ngân hàng -->
+            <div class="col-12 portfolio-item isotope-item filter-bank">
+              <h4>Thông tin tài khoản ngân hàng</h4>
+              <p><strong>Ngân hàng:</strong> MB Bank</p>
+              <p><strong>Chủ tài khoản:</strong> Phạm Ánh Nguyệt</p>
+              <p><strong>Số tài khoản:</strong> 0944510943</p>
+              <p><strong>Chi nhánh:</strong> Hà Nội</p>
+              <p>Vui lòng nhập đúng nội dung chuyển khoản: <strong>{{ user.username }}</strong></p>
+              <p>Liên lạc qua các kênh <a href="https://www.facebook.com/nguyetpham.19.2/" target="_blank">Facebook</a> hoặc <a href="https://zalo.me/0944510943" target="_blank">Zalo</a> để được hỗ trợ.</p>
+            </div><!-- End Bank Account Item -->
 
-          <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-branding">
-            <img src="assets/img/masonry-portfolio/masonry-portfolio-3.jpg" class="img-fluid" alt="">
-            <div class="portfolio-info">
-              <h4>Branding 1</h4>
-              <p>Lorem ipsum, dolor sit</p>
-              <a href="assets/img/masonry-portfolio/masonry-portfolio-3.jpg" title="Branding 1" data-gallery="portfolio-gallery-branding" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
-              <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
-            </div>
-          </div><!-- End Portfolio Item -->
-
-          <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-app">
-            <img src="assets/img/masonry-portfolio/masonry-portfolio-4.jpg" class="img-fluid" alt="">
-            <div class="portfolio-info">
-              <h4>App 2</h4>
-              <p>Lorem ipsum, dolor sit</p>
-              <a href="assets/img/masonry-portfolio/masonry-portfolio-4.jpg" title="App 2" data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
-              <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
-            </div>
-          </div><!-- End Portfolio Item -->
-
-          <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-product">
-            <img src="assets/img/masonry-portfolio/masonry-portfolio-5.jpg" class="img-fluid" alt="">
-            <div class="portfolio-info">
-              <h4>Product 2</h4>
-              <p>Lorem ipsum, dolor sit</p>
-              <a href="assets/img/masonry-portfolio/masonry-portfolio-5.jpg" title="Product 2" data-gallery="portfolio-gallery-product" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
-              <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
-            </div>
-          </div><!-- End Portfolio Item -->
-
-          <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-branding">
-            <img src="assets/img/masonry-portfolio/masonry-portfolio-6.jpg" class="img-fluid" alt="">
-            <div class="portfolio-info">
-              <h4>Branding 2</h4>
-              <p>Lorem ipsum, dolor sit</p>
-              <a href="assets/img/masonry-portfolio/masonry-portfolio-6.jpg" title="Branding 2" data-gallery="portfolio-gallery-branding" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
-              <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
-            </div>
-          </div><!-- End Portfolio Item -->
-
-          <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-app">
-            <img src="assets/img/masonry-portfolio/masonry-portfolio-7.jpg" class="img-fluid" alt="">
-            <div class="portfolio-info">
-              <h4>App 3</h4>
-              <p>Lorem ipsum, dolor sit</p>
-              <a href="assets/img/masonry-portfolio/masonry-portfolio-7.jpg" title="App 3" data-gallery="portfolio-gallery-app" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
-              <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
-            </div>
-          </div><!-- End Portfolio Item -->
-
-          <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-product">
-            <img src="assets/img/masonry-portfolio/masonry-portfolio-8.jpg" class="img-fluid" alt="">
-            <div class="portfolio-info">
-              <h4>Product 3</h4>
-              <p>Lorem ipsum, dolor sit</p>
-              <a href="assets/img/masonry-portfolio/masonry-portfolio-8.jpg" title="Product 3" data-gallery="portfolio-gallery-product" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
-              <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
-            </div>
-          </div><!-- End Portfolio Item -->
-
-          <div class="col-lg-4 col-md-6 portfolio-item isotope-item filter-branding">
-            <img src="assets/img/masonry-portfolio/masonry-portfolio-9.jpg" class="img-fluid" alt="">
-            <div class="portfolio-info">
-              <h4>Branding 3</h4>
-              <p>Lorem ipsum, dolor sit</p>
-              <a href="assets/img/masonry-portfolio/masonry-portfolio-9.jpg" title="Branding 2" data-gallery="portfolio-gallery-branding" class="glightbox preview-link"><i class="bi bi-zoom-in"></i></a>
-              <a href="portfolio-details.html" title="More Details" class="details-link"><i class="bi bi-link-45deg"></i></a>
-            </div>
-          </div><!-- End Portfolio Item -->
-
-        </div><!-- End Portfolio Container -->
-
+          </div><!-- End Portfolio Container -->
+        </div><!-- End Centering Wrapper -->
       </div>
-
     </div>
-
   </section><!-- /Portfolio Section -->
-
 </main>
+
+
+
 {% endblock main-content %}
