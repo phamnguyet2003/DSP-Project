@@ -62,8 +62,8 @@
               <li><a href="{% url 'instruction' %}" class="{% if request.path == '/instruction/' %}active{% endif %}">Hướng dẫn sử dụng</a></li>
               <li class="dropdown"><a href="#"><span>Contact</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
                 <ul>
-                  <li><a href="#">Liên hệ Zalo</a></li>
-                  <li><a href="#">Liên hệ Facebook</a></li>
+                  <li><a href="https://zalo.me/0944510943">Liên hệ Zalo</a></li>
+                  <li><a href="https://www.facebook.com/nguyetpham.19.2/">Liên hệ Facebook</a></li>
                 </ul>
               </li>
             </ul>
@@ -77,6 +77,8 @@
                   <li><a href="{% url 'history_buy' %}">Lịch sử mua</a></li>
               </ul>
           </li>
+          <span class="customer-value">Số dư: {{ customer_value }} VNĐ</span>
+
           {% endblock %}
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>

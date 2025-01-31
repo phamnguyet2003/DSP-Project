@@ -1,8 +1,9 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_migrate
 from django.dispatch import receiver
 from .models import Customer, Wallet, Subscription, Package
 from django.utils import timezone
 from datetime import timedelta
+from django.utils.timezone import now
 
 @receiver(post_save, sender=Customer)
 def create_wallet_and_subscription(sender, instance, created, **kwargs):
@@ -22,3 +23,11 @@ def create_wallet_and_subscription(sender, instance, created, **kwargs):
             )
         except Package.DoesNotExist:
             print("Package with ID=1 does not exist.")
+
+@receiver(post_migrate)
+def check_and_update_subscriptions(sender, **kwargs):
+    print('🔄 Signal check_and_update_subscriptions is running...')  # Kiểm tra signal có chạy không
+    today = now().date()
+    expired_subs = Subscription.objects.filter(end_date__lt=today, status=True)
+    count = expired_subs.update(status=False)
+    print(f"✅ Updated {count} expired subscriptions to inactive.")

@@ -1,93 +1,75 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block main-content %}
 <main class="main">
 
-  <!-- Contact Section -->
-  <section id="contact" class="contact section">
-
+  <!-- Hướng Dẫn Sử Dụng -->
+  <section id="guide" class="guide section">
+    
     <!-- Section Title -->
-    <div class="container section-title" data-aos="fade-up">
-      <h2>Contact</h2>
-      <p>Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p>
+    <div class="container section-title text-center" data-aos="fade-up">
+      <h2 class="section-title-heading mb-3">Hướng Dẫn Sử Dụng</h2>
+      <p class="section-title-description">Các mục hướng dẫn sử dụng của hệ thống:</p>
     </div><!-- End Section Title -->
 
-    <div class="container" data-aos="fade-up" data-aos-delay="100">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-8" data-aos="fade-up" data-aos-delay="100">
 
-      <div class="row gy-4">
-
-        <div class="col-lg-5">
-
-          <div class="info-wrap">
-            <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="200">
-              <i class="bi bi-geo-alt flex-shrink-0"></i>
-              <div>
-                <h3>Address</h3>
-                <p>A108 Adam Street, New York, NY 535022</p>
-              </div>
-            </div><!-- End Info Item -->
-
-            <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="300">
-              <i class="bi bi-telephone flex-shrink-0"></i>
-              <div>
-                <h3>Call Us</h3>
-                <p>+1 5589 55488 55</p>
-              </div>
-            </div><!-- End Info Item -->
-
-            <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="400">
-              <i class="bi bi-envelope flex-shrink-0"></i>
-              <div>
-                <h3>Email Us</h3>
-                <p>info@example.com</p>
-              </div>
-            </div><!-- End Info Item -->
-
-            <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d48389.78314118045!2d-74.006138!3d40.710059!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25a22a3bda30d%3A0xb89d1fe6bc499443!2sDowntown%20Conference%20Center!5e0!3m2!1sen!2sus!4v1676961268712!5m2!1sen!2sus" frameborder="0" style="border:0; width: 100%; height: 270px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <!-- Mục 1: HDSD Tool -->
+          <div class="guide-item mb-4">
+            <h3 class="guide-item-title">1. Hướng Dẫn Sử Dụng Tool</h3>
+            <p>Thông tin hướng dẫn sử dụng tool sẽ được cập nhật sau.</p>
           </div>
+
+          <!-- Mục 2: Hướng Dẫn Nạp Tiền -->
+          <div class="guide-item mb-4">
+            <h3 class="guide-item-title">2. Hướng Dẫn Nạp Tiền</h3>
+            <p>Để nạp tiền vào tài khoản của bạn, vui lòng làm theo các bước dưới đây:</p>
+            <ol>
+              <li>Đăng nhập vào tài khoản của bạn.</li>
+              <li>Chọn mục <strong>Nạp Tiền</strong> từ menu.</li>
+              <li>Chọn phương thức nạp tiền và điền thông tin yêu cầu.</li>
+              <li>Chờ <strong>2-5 phút</strong> để hoàn tất giao dịch.</li>
+            </ol>
+            <p><img src="{% static 'assets/img/nap_tien.png' %}" alt="Hướng dẫn nạp tiền 1" class="img-fluid mb-3"></p>
+            {% comment %} <p><img src="{% static 'assets/img/nap_tien.png' %}" alt="Hướng dẫn nạp tiền 2" class="img-fluid"></p> {% endcomment %}
+            <p><i>Nếu sau 2-5 phút bạn không thấy thay đổi hãy liên hệ chúng tôi qua <a href="https://www.facebook.com/nguyetpham.19.2/" target="_blank">Facebook</a> hoặc <a href="https://zalo.me/0944510943" target="_blank">Zalo</a></i> để được hỗ trợ!</p>
+
+          </div>
+
+          <!-- Mục 3: Hướng Dẫn Mua Gói -->
+          <div class="guide-item mb-4">
+            <h3 class="guide-item-title">3. Hướng Dẫn Mua Gói</h3>
+            <p>Để mua gói dịch vụ, làm theo các bước sau:</p>
+            <ol>
+              <li>Chọn gói dịch vụ mà bạn muốn mua từ danh sách.</li>
+              <li>Nhấn vào <strong>Chọn Mua</strong> để bắt đầu quá trình thanh toán.</li>
+              <p><img src="{% static 'assets/img/mua_goi.png' %}" alt="Hướng dẫn mua gói 1" class="img-fluid mb-3"></p>
+              <li>Điền thông tin thanh toán và xác nhận giao dịch.</li>
+              <p><img src="{% static 'assets/img/mua_goi2.png' %}" alt="Hướng dẫn mua gói 2" class="img-fluid"></p>
+              <li>Hoàn tất thanh toán và hệ thống sẽ tự động kích hoạt gói cho bạn.</li>
+
+            </ol>
+          </div>
+
+          <!-- Mục 4: Hướng Dẫn Liên Hệ -->
+          <div class="guide-item mb-4">
+            <h3 class="guide-item-title">4. Hướng Dẫn Liên Hệ</h3>
+            <p>Để liên hệ với chúng tôi, bạn có thể sử dụng các phương thức sau:</p>
+            <ul>
+              <li>Gửi email đến <strong>pham.nguyet.is.here@gmail.com</strong></li>
+              <li>Gọi đến số điện thoại: <strong>(+84) 944 510 943</strong></li>
+              <li>Truy cập trang hỗ trợ trực tuyến tại <a href="https://www.facebook.com/nguyetpham.19.2/">đây</a>.</li>
+            </ul>
+          </div>
+
         </div>
-
-        <div class="col-lg-7">
-          <form action="forms/contact.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
-            <div class="row gy-4">
-
-              <div class="col-md-6">
-                <label for="name-field" class="pb-2">Your Name</label>
-                <input type="text" name="name" id="name-field" class="form-control" required="">
-              </div>
-
-              <div class="col-md-6">
-                <label for="email-field" class="pb-2">Your Email</label>
-                <input type="email" class="form-control" name="email" id="email-field" required="">
-              </div>
-
-              <div class="col-md-12">
-                <label for="subject-field" class="pb-2">Subject</label>
-                <input type="text" class="form-control" name="subject" id="subject-field" required="">
-              </div>
-
-              <div class="col-md-12">
-                <label for="message-field" class="pb-2">Message</label>
-                <textarea class="form-control" name="message" rows="10" id="message-field" required=""></textarea>
-              </div>
-
-              <div class="col-md-12 text-center">
-                <div class="loading">Loading</div>
-                <div class="error-message"></div>
-                <div class="sent-message">Your message has been sent. Thank you!</div>
-
-                <button type="submit">Send Message</button>
-              </div>
-
-            </div>
-          </form>
-        </div><!-- End Contact Form -->
-
       </div>
-
     </div>
 
-  </section><!-- /Contact Section -->
+  </section><!-- /Hướng Dẫn Sử Dụng -->
 
 </main>
 {% endblock main-content %}

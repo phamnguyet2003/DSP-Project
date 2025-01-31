@@ -44,9 +44,9 @@ class Subscription(models.Model):
 # Payment model: Lưu thông tin thanh toán
 class Payment(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    package = models.ForeignKey(Package, on_delete=models.CASCADE, default=1)
     transaction_date = models.DateTimeField(auto_now_add=True)
     value = models.DecimalField(max_digits=10, decimal_places=2)
-
     def __str__(self):
         return f"Payment of {self.value} for {self.customer.name}"
 

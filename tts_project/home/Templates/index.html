@@ -13,6 +13,15 @@
         <div class="col-lg-8">
           <h2>CHAMELION VOICE</h2>
           <p>I'm a professional Text to Speech Tools for Vietnamese!</p>
+
+          <!-- Hiển thị thông tin gói dịch vụ nếu có -->
+          {% if package.name %}
+            <p><strong>Gói hiện tại:</strong> {{ package.name }}</p>
+            <p><strong>Thời gian:</strong> {{ package.start|date:"Y-m-d" }} đến {{ package.end|date:"Y-m-d" }}</p>
+          {% else %}
+            <p><strong>Chưa có gói dịch vụ nào.</strong></p>
+          {% endif %}
+
           <a href="{% url 'index' %}" class="btn-get-started">Try</a>
         </div>
       </div>
@@ -21,9 +30,4 @@
   </section><!-- /Hero Section -->
 
 </main>
-{% endblock main-content %}
-
-
-
-
-  
+{% endblock %}

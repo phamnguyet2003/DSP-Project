@@ -25,9 +25,10 @@ urlpatterns = [
     path("money/", views.get_money, name='money'),
     path("payments/", views.get_payments, name='payments'),
     path("profile/", views.get_profile, name='profile'),
+    path('edit_profile/', views.edit_profile, name='edit_profile'),
     path("history_use/", views.get_history_use, name='history_use'),
     path("history_buy/", views.get_history_buy, name='history_buy'),
     path('login/', views.login, name='login'),
     path('register/', views.register, name='register'),  
-    # path('success/', views.success_view, name='success'),
+    path('buy_package/', views.buy_package, name='buy_package'),
 ]

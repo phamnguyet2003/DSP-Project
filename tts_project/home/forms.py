@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from .models import Customer
 
 class RegisterForm(UserCreationForm):
@@ -18,3 +18,11 @@ class RegisterForm(UserCreationForm):
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=150, required=True)
     password = forms.CharField(widget=forms.PasswordInput(), required=True)
+    
+class EditProfileForm(UserChangeForm):
+    name = forms.CharField(max_length=150, required=True)
+    email = forms.EmailField(required=True)
+
+    class Meta:
+        model = Customer
+        fields = ('name', 'email',)
