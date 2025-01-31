@@ -7,6 +7,7 @@ from .forms import RegisterForm, LoginForm, EditProfileForm
 from .models import *
 from datetime import timedelta
 from django.core.cache import cache
+from django.contrib.auth import logout
 
 
 # Create your views here.
@@ -50,26 +51,6 @@ def get_money(request): # nạp tiền
     money = request.user.money
     
     return render(request, 'money.html', {'username':username, 'customer_value': money})
-
-# def get_profile(request): # trang cá nhân
-#     if not request.user.is_authenticated:
-#         return redirect('login')  # Hoặc trang đăng nhập của bạn
-#     username = request.user.name
-#     money = request.user.money
-#     customer = request.user  # Lấy thông tin từ user đã đăng nhập
-#     user = request.user
-
-#     # Kiểm tra nếu người dùng gửi form chỉnh sửa
-#     if request.method == "POST":
-#         form = EditProfileForm(request.POST, instance=user)
-#         if form.is_valid():
-#             form.save()
-#             messages.success(request, 'Thông tin đã được cập nhật!')
-#             return redirect('profile')  # Redirect lại trang cá nhân sau khi lưu thông tin
-#     else:
-#         form = EditProfileForm(instance=user)
-#     return render(request, 'profile.html', {'username':username, 'customer_value': money, 'customer': customer, 'form':form})
-
 
 def get_profile(request):
     if not request.user.is_authenticated:
@@ -252,3 +233,7 @@ def login(request):
 
     return render(request, 'login.html', {'form': form})
 
+
+def logout_view(request):
+    logout(request)  # Đăng xuất người dùng
+    return redirect('login')  # Chuyển hướng về trang chủ sau khi đăng xuất
