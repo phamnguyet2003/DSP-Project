@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+{% block main-content %}
+<main class="main">
+  <!-- Portfolio Section -->
+  <section id="portfolio" class="portfolio section">
+    <!-- Section Title -->
+    <div class="container section-title text-center" data-aos="fade-up">
+      <h2>Nạp tiền vào tài khoản</h2>
+      <p>Vui lòng chờ 2-5 phút để chúng tôi xác nhận.</p>
+    </div><!-- End Section Title -->
+
+    <div class="container">
+      <div class="isotope-layout" data-default-filter=".filter-qr" data-layout="masonry" data-sort="original-order">
+        <ul class="portfolio-filters isotope-filters d-flex justify-content-center" data-aos="fade-up" data-aos-delay="100">
+          <li data-filter=".filter-qr" class="filter-active">QR Code</li>
+          <li data-filter=".filter-bank">Số tài khoản</li>
+        </ul><!-- End Portfolio Filters -->
+
+        <div class="d-flex justify-content-center">
+          <div class="row gy-4 isotope-container text-center" data-aos="fade-up" data-aos-delay="200" style="width: 100%; max-width: 600px;">
+            
+            <!-- Hiển thị QR Code -->
+            <div class="col-12 portfolio-item isotope-item filter-qr">
+              <img src="{% static '\assets\img\qr_code\qr_code.jpg' %}" class="img-fluid mb-3" alt="QR Code Thanh Toán" width="300">
+              <p>Vui lòng quét mã QR để chuyển khoản và nhập nội dung thanh toán là <strong>{{ user.username }}</strong></p>
+              <p>Liên lạc qua các kênh <a href="https://www.facebook.com/nguyetpham.19.2/" target="_blank">Facebook</a> hoặc <a href="https://zalo.me/0944510943" target="_blank">Zalo</a> để được hỗ trợ.</p>
+
+            </div><!-- End QR Code Item -->
+
+            <!-- Hiển thị thông tin tài khoản ngân hàng -->
+            <div class="col-12 portfolio-item isotope-item filter-bank">
+              <h4>Thông tin tài khoản ngân hàng</h4>
+              <p><strong>Ngân hàng:</strong> MB Bank</p>
+              <p><strong>Chủ tài khoản:</strong> Phạm Ánh Nguyệt</p>
+              <p><strong>Số tài khoản:</strong> 0944510943</p>
+              <p><strong>Chi nhánh:</strong> Hà Nội</p>
+              <p>Vui lòng nhập đúng nội dung chuyển khoản: <strong>{{ user.username }}</strong></p>
+              <p>Liên lạc qua các kênh <a href="https://www.facebook.com/nguyetpham.19.2/" target="_blank">Facebook</a> hoặc <a href="https://zalo.me/0944510943" target="_blank">Zalo</a> để được hỗ trợ.</p>
+            </div><!-- End Bank Account Item -->
+
+          </div><!-- End Portfolio Container -->
+        </div><!-- End Centering Wrapper -->
+      </div>
+    </div>
+  </section><!-- /Portfolio Section -->
+</main>
+
+
+
+{% endblock main-content %}

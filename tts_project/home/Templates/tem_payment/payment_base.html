@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block main-content %}
+<main class="main">
+
+  <!-- Hiển thị thông báo lên đầu trang nếu có -->
+  {% if messages %}
+    <div class="alert alert-info">
+      {% for message in messages %}
+        <p>{{ message }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <section id="payment" class="contact section">
+    <div class="container section-title" data-aos="fade-up">
+      <h2>Mua gói trải nghiệm</h2>
+      <p>Ấn xác nhận khi hoàn thành đơn hàng và trải nghiệm ngay.</p>
+    </div>
+
+    <div class="container" data-aos="fade-up" data-aos-delay="100">
+      <div class="row gy-4 justify-content-center">
+        <div class="col-lg-7 justify-content-center">
+            <form id="purchase-form" method="POST" action="{% url 'buy_package' %}" data-aos="fade-up" data-aos-delay="200">
+                {% csrf_token %}
+                <div class="row gy-4">
+        
+                    <div class="col-md-6">
+                        <label for="name-field" class="pb-2">Your Name</label>
+                        <input type="text" name="name" id="name-field" class="form-control" required>
+                    </div>
+        
+                    <div class="col-md-6">
+                        <label for="email-field" class="pb-2">Email</label>
+                        <input type="email" class="form-control" name="email" id="email-field" required>
+                    </div>
+        
+                    <div class="col-md-12">
+                        <label for="phone-field" class="pb-2">Phone</label>
+                        <input type="text" class="form-control" name="phone" id="phone-field" required>
+                    </div>
+        
+                    <div class="col-md-12">
+                        <label for="codevoucher-field" class="pb-2">Mã giảm giá (nếu có):</label>
+                        <input type="text" class="form-control" name="codevoucher" id="codevoucher-field">
+                    </div>
+        
+                    <div class="col-md-12">
+                        <label for="package-field" class="pb-2">Package</label>
+                        <select class="form-control" name="package" id="package-field" required>
+                            <option value="" disabled selected>Chọn gói dịch vụ</option>
+                            {% for package in packages %}
+                                <option value="{{ package.id }}">{{ package.name }} - {{ package.price }} VNĐ</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-12 text-center">            
+                        <button type="submit" name="confirm_button" class="btn btn-primary" id="confirm-button" >Xác nhận</button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+{% endblock %}

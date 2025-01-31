@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static %}
+{% block main-content %}
+<main class="main">
+
+  <!-- Pricing Section -->
+  <section id="pricing" class="pricing section">
+
+    <!-- Section Title -->
+    <div class="container section-title" data-aos="fade-up">
+      <h2>Gói trải nghiệm</h2>
+      <p>Hãy chọn những gói phù hợp với nhu cầu của bạn!</p>
+    </div><!-- End Section Title -->
+    
+    <div class="container">
+      <div class="row justify-content-center"> <!-- Căn giữa toàn bộ row -->
+        
+        <!-- Free Package -->
+        <div class="col-lg-4 col-md-6 d-flex justify-content-center" data-aos="fade-up" data-aos-delay="100">
+          <div class="pricing-item text-center">
+            <h3>Free</h3>
+            <p class="price">$0</p>
+            <ul>
+              <li>Access to basic features</li>
+              <li>Limited support</li>
+              <li>1 GB storage</li>
+            </ul>
+            <a href="{% url 'buy_package' %}" class="btn btn-primary">Mua ngay</a>
+          </div>
+        </div><!-- End Free Package -->
+
+        <!-- Normal Package -->
+        <div class="col-lg-4 col-md-6 d-flex justify-content-center" data-aos="fade-up" data-aos-delay="200">
+          <div class="pricing-item text-center">
+            <h3>Normal</h3>
+            <p class="price">$10/month</p>
+            <ul>
+              <li>Access to standard features</li>
+              <li>Priority support</li>
+              <li>10 GB storage</li>
+            </ul>
+            <a href="{% url 'buy_package' %}" class="btn btn-primary">Mua ngay</a>
+          </div>
+        </div><!-- End Normal Package -->
+
+        <!-- Pro Package -->
+        <div class="col-lg-4 col-md-6 d-flex justify-content-center" data-aos="fade-up" data-aos-delay="300">
+          <div class="pricing-item text-center">
+            <h3>Pro</h3>
+            <p class="price">$30/month</p>
+            <ul>
+              <li>Access to all features</li>
+              <li>24/7 premium support</li>
+              <li>Unlimited storage</li>
+            </ul>
+            <a href="{% url 'buy_package' %}" class="btn btn-primary">Mua ngay</a>
+          </div>
+        </div><!-- End Pro Package -->
+
+      </div>
+    </div>
+    
+  </section><!-- End Pricing Section -->
+
+</main>
+
+{% endblock main-content %}

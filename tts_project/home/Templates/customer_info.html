@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load static %}
+{% block main-content %}
+  <main class="main">
+
+    <h2>Enter Customer Information</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save</button>
+    </form>
+
+  </main>
+{% endblock main-content %}
