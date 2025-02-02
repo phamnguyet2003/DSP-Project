@@ -9,7 +9,12 @@ from datetime import timedelta
 from django.core.cache import cache
 from django.contrib.auth import logout
 
-
+# model
+from gtts import gTTS
+import string
+import random
+import os
+import shutil
 # Create your views here.
 def get_home(request):
     
@@ -28,21 +33,47 @@ def get_payments(request): # mua gói cước
     
     return render(request, 'payments.html', {'username':username, 'customer_value': money})
 
-def get_index(request): # giao diện để dùng tool
+def get_index(request):
     if not request.user.is_authenticated:
         return redirect('login')  # Hoặc trang đăng nhập của bạn
     customer = Customer.objects.get(username=request.user.username)
+    
     # Lấy gói dịch vụ active của người dùng
     active_subscription = Subscription.objects.filter(customer=customer, status=True).first()
     if active_subscription:
         active_package_name = active_subscription.package.name 
         active_package_start_date = active_subscription.start_date 
         active_package_end_date = active_subscription.end_date
-        
 
     username = request.user.name
     money = request.user.money
-    return render(request, 'index.html', {'username':username, 'customer_value': money, 'package':{'name':active_package_name, 'start':active_package_start_date, 'end':active_package_end_date}})
+    
+    loc = None  # Khởi tạo biến `loc` cho việc truyền kết quả file âm thanh
+
+    if request.method == "POST":
+        letters = string.ascii_lowercase
+
+        file_name = f"{''.join(random.choice(letters) for i in range(10))}.mp3"
+
+        text = request.POST['text']
+        tdl = request.POST['tdl']
+        lang = request.POST['lang']
+
+        tts = gTTS(text, lang=lang, tld=tdl)
+        tts.save(file_name)
+
+        dir = os.getcwd()
+        full_dir = os.path.join(dir, file_name)
+        print(dir)
+        print(full_dir)
+
+        # Di chuyển file vào thư mục tĩnh
+        dest = shutil.move(full_dir, os.path.join(dir, "static/sound/"))
+        
+        # Lưu tên file vào biến loc để hiển thị trên trang
+        loc = file_name
+
+    return render(request, 'index.html', {'username': username, 'customer_value': money, 'package': {'name': active_package_name, 'start': active_package_start_date, 'end': active_package_end_date}, 'loc': loc})
 
 def get_money(request): # nạp tiền
     if not request.user.is_authenticated:
@@ -237,3 +268,4 @@ def login(request):
 def logout_view(request):
     logout(request)  # Đăng xuất người dùng
     return redirect('login')  # Chuyển hướng về trang chủ sau khi đăng xuất
+
