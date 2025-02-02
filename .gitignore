@@ -6,3 +6,9 @@ db.sqlite3
 
 Sound/*.mp3
 note.txt
+
+.vscode/
+.idea/
+*.swp
+.DS_Store
+myenv/
