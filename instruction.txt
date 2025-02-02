@@ -1,0 +1,8 @@
+1. Active môi trường ảo
+    myenv\Scripts\activate
+
+2. Vào thư mục Project
+cd tts_project
+
+3. Chạy app 
+python manage.py runserver
