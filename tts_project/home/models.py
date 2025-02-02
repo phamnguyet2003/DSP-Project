@@ -41,7 +41,7 @@ class Subscription(models.Model):
         return f"Subscription for {self.customer.name} to {self.package.language}"
 
 
-# Payment model: Lưu thông tin thanh toán
+# Payment model: Lưu thông tin thanh toán tiền trong hệ thống mà khách hàng dùng mua gói cước
 class Payment(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     package = models.ForeignKey(Package, on_delete=models.CASCADE, default=1)
@@ -62,12 +62,18 @@ class History(models.Model):
         return f"History for {self.customer.name} on {self.date}"
 
 
-# Wallet model: Lưu số dư ví của khách hàng
+# Wallet model: Lưu tiền khách chuyển vào hệ thống
 class Wallet(models.Model):
-    customer = models.OneToOneField(Customer, on_delete=models.CASCADE)
-    transaction_date = models.DateTimeField(default=now)  # Thêm default=now
+    customer = models.ForeignKey('Customer', on_delete=models.CASCADE)
+    transaction_date = models.DateTimeField(default=now)
     value = models.DecimalField(max_digits=10, decimal_places=2)
-    total = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def save(self, *args, **kwargs):
+        """Cập nhật money của Customer khi Wallet được thêm hoặc cập nhật"""
+        if self.pk is None:  # Chỉ cập nhật khi tạo mới
+            self.customer.money += self.value
+            self.customer.save()
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Wallet for {self.customer.name}"
+        return f"Wallet for {self.customer.username}"

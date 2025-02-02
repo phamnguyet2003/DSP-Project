@@ -106,7 +106,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+# TIME_ZONE = "UTC"
+TIME_ZONE = 'Asia/Ho_Chi_Minh'
+USE_TZ = True  # Giữ nguyên để Django vẫn lưu dữ liệu theo UTC trong database
 
 USE_I18N = True
 

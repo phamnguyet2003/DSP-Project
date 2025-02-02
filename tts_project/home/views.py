@@ -33,7 +33,7 @@ def get_payments(request): # mua gói cước
     
     return render(request, 'payments.html', {'username':username, 'customer_value': money})
 
-def get_index(request):
+def get_index(request): # trang dùng tool
     if not request.user.is_authenticated:
         return redirect('login')  # Hoặc trang đăng nhập của bạn
     customer = Customer.objects.get(username=request.user.username)

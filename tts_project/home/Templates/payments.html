@@ -2,66 +2,76 @@
 {% load static %}
 {% block main-content %}
 <main class="main">
-
   <!-- Pricing Section -->
   <section id="pricing" class="pricing section">
-
     <!-- Section Title -->
     <div class="container section-title" data-aos="fade-up">
       <h2>Gói trải nghiệm</h2>
       <p>Hãy chọn những gói phù hợp với nhu cầu của bạn!</p>
     </div><!-- End Section Title -->
-    
+
     <div class="container">
       <div class="row justify-content-center"> <!-- Căn giữa toàn bộ row -->
-        
+
         <!-- Free Package -->
         <div class="col-lg-4 col-md-6 d-flex justify-content-center" data-aos="fade-up" data-aos-delay="100">
-          <div class="pricing-item text-center">
+          <div class="pricing-item d-flex flex-column align-items-center">
             <h3>Free</h3>
-            <p class="price">$0</p>
+            <p class="price">0 VNĐ</p>
             <ul>
-              <li>Access to basic features</li>
-              <li>Limited support</li>
-              <li>1 GB storage</li>
+              <li>Lượng chữ: 500</li>
+              <li>Chất lượng âm thanh: Trung bình</li>
+              <li>Ngôn ngữ: Tiếng Việt</li>
             </ul>
-            <a href="{% url 'buy_package' %}" class="btn btn-primary">Mua ngay</a>
+            <div class="btn-container">
+              <a href="{% url 'index' %}" class="btn btn-primary">Thử ngay</a>
+            </div>
           </div>
         </div><!-- End Free Package -->
 
         <!-- Normal Package -->
         <div class="col-lg-4 col-md-6 d-flex justify-content-center" data-aos="fade-up" data-aos-delay="200">
-          <div class="pricing-item text-center">
+          <div class="pricing-item d-flex flex-column align-items-center">
             <h3>Normal</h3>
-            <p class="price">$10/month</p>
+            <p class="price">100,000 VNĐ/tháng</p>
             <ul>
-              <li>Access to standard features</li>
-              <li>Priority support</li>
-              <li>10 GB storage</li>
+              <li>Lượng chữ: 10,000</li>
+              <li>Chất lượng âm thanh: Tốt hơn</li>
+              <li>Ngôn ngữ: Đa dạng</li>
+              <li>Âm thanh: Hơn 30 giọng</li>
+              <li>Nâng cao: Cho phép người dùng điều chỉnh tốc độ và độ cao âm thanh đầu ra</li>
+              <li>Lưu trữ đám mây: Lưu trữ 1GB file âm thanh</li>
+              <li>No Ad</li>
             </ul>
-            <a href="{% url 'buy_package' %}" class="btn btn-primary">Mua ngay</a>
+            <div class="btn-container">
+              <a href="{% url 'buy_package' %}" class="btn btn-primary">Mua ngay</a>
+            </div>
           </div>
         </div><!-- End Normal Package -->
 
         <!-- Pro Package -->
         <div class="col-lg-4 col-md-6 d-flex justify-content-center" data-aos="fade-up" data-aos-delay="300">
-          <div class="pricing-item text-center">
+          <div class="pricing-item d-flex flex-column align-items-center">
             <h3>Pro</h3>
-            <p class="price">$30/month</p>
+            <p class="price">300,000 VNĐ/tháng</p>
             <ul>
-              <li>Access to all features</li>
-              <li>24/7 premium support</li>
-              <li>Unlimited storage</li>
+              <li>Lượng chữ: Không giới hạn</li>
+              <li>Chất lượng âm thanh: Tốt nhất</li>
+              <li>Ngôn ngữ: Đa dạng</li>
+              <li>Âm thanh: Hơn 30 giọng</li>
+              <li>Nâng cao: Cho phép người dùng điều chỉnh tốc độ, độ cao và hiệu ứng âm thanh đầu ra</li>
+              <li>Lưu trữ đám mây: Lưu trữ không giới hạn file âm thanh</li>
+              <li>No Ad</li>
             </ul>
-            <a href="{% url 'buy_package' %}" class="btn btn-primary">Mua ngay</a>
+            <div class="btn-container">
+              <a href="{% url 'buy_package' %}" class="btn btn-primary">Mua ngay</a>
+            </div>
           </div>
         </div><!-- End Pro Package -->
 
       </div>
     </div>
-    
+
   </section><!-- End Pricing Section -->
-
 </main>
-
 {% endblock main-content %}

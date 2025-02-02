@@ -73,7 +73,7 @@
               <a href="#"><span>{{ username }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
               <ul>
                   <li><a href="{% url 'profile' %}">Trang cá nhân</a></li>
-                  <li><a href="{% url 'history_use' %}">Lịch sử sử dụng</a></li>
+                  {% comment %} <li><a href="{% url 'history_use' %}">Lịch sử sử dụng</a></li> {% endcomment %}
                   <li><a href="{% url 'history_buy' %}">Lịch sử mua</a></li>
                   <li><a href="{% url 'logout' %}">Đăng xuất</a></li>
               </ul>
