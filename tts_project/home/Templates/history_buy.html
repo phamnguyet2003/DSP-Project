@@ -32,6 +32,7 @@
                   <td>{{ payment.transaction_date }}</td>
                   <td>{{ payment.package.name }}</td> <!-- Tên gói từ bảng Package -->
                   <td>{{ payment.value }} VNĐ</td> <!-- Giá trị giao dịch -->
+
                 </tr>
                 {% empty %}
                 <tr>
@@ -50,7 +51,6 @@
                 <tr>
                   <th>Ngày</th>
                   <th>Số Tiền Nạp</th>
-                  <th>Số Dư Sau Nạp</th>
                 </tr>
               </thead>
               <tbody>
@@ -58,7 +58,6 @@
                 <tr>
                   <td>{{ wallet.transaction_date }}</td>
                   <td>{{ wallet.value }} VNĐ</td> <!-- Số tiền nạp -->
-                  <td>{{ wallet.total }} VNĐ</td> <!-- Số dư sau khi nạp -->
                 </tr>
                 {% empty %}
                 <tr>

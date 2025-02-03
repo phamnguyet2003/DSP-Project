@@ -8,6 +8,7 @@ from .models import *
 from datetime import timedelta
 from django.core.cache import cache
 from django.contrib.auth import logout
+from django.db.models import Q
 
 # model
 from gtts import gTTS
@@ -33,26 +34,99 @@ def get_payments(request): # mua gói cước
     
     return render(request, 'payments.html', {'username':username, 'customer_value': money})
 
-def get_index(request): # trang dùng tool
-    if not request.user.is_authenticated:
-        return redirect('login')  # Hoặc trang đăng nhập của bạn
-    customer = Customer.objects.get(username=request.user.username)
+# def get_index(request): # trang dùng tool
+#     if not request.user.is_authenticated:
+#         return redirect('login')  # Hoặc trang đăng nhập của bạn
+#     customer = Customer.objects.get(username=request.user.username)
     
-    # Lấy gói dịch vụ active của người dùng
+#     # Lấy gói dịch vụ active của người dùng
+#     active_subscription = Subscription.objects.filter(customer=customer, status=True).first()
+#     if active_subscription:
+#         active_package_name = active_subscription.package.name 
+#         active_package_start_date = active_subscription.start_date 
+#         active_package_end_date = active_subscription.end_date
+
+#         if active_package_name == 'Free Package':
+#             char_limit = 500
+#         elif active_package_name == 'Normal Package':
+#             char_limit = 5000
+#         elif active_package_name >= 'Pro Package':
+#             char_limit = None  # Không giới hạn
+
+#     username = request.user.name
+#     money = request.user.money
+    
+#     loc = None  # Khởi tạo biến `loc` cho việc truyền kết quả file âm thanh
+
+#     if request.method == "POST":
+#         letters = string.ascii_lowercase
+
+#         file_name = f"{''.join(random.choice(letters) for i in range(10))}.mp3"
+
+#         text = request.POST['text']
+#         tdl = request.POST['tdl']
+#         lang = request.POST['lang']
+
+#         tts = gTTS(text, lang=lang, tld=tdl)
+#         tts.save(file_name)
+
+#         dir = os.getcwd()
+#         full_dir = os.path.join(dir, file_name)
+#         print(dir)
+#         print(full_dir)
+
+#         # Di chuyển file vào thư mục tĩnh
+#         dest = shutil.move(full_dir, os.path.join(dir, "static/sound/"))
+        
+#         # Lưu tên file vào biến loc để hiển thị trên trang
+#         loc = file_name
+
+#     return render(request, 'index.html', {'username': username, 'customer_value': money, 'package': {'name': active_package_name, 'start': active_package_start_date, 'end': active_package_end_date}, 'char_limit':char_limit, 'loc': loc})
+
+import os
+import shutil
+import random
+import string
+from django.shortcuts import render, redirect
+from gtts import gTTS
+from django.conf import settings
+from .models import Customer, Subscription
+
+def get_index(request):  
+    if not request.user.is_authenticated:
+        return redirect('login')  
+
+    customer = Customer.objects.get(username=request.user.username)
     active_subscription = Subscription.objects.filter(customer=customer, status=True).first()
+
+    char_limit = 500  # Mặc định cho gói Free
+    active_package_name = None
+    active_package_start_date = None
+    active_package_end_date = None
+
     if active_subscription:
         active_package_name = active_subscription.package.name 
         active_package_start_date = active_subscription.start_date 
         active_package_end_date = active_subscription.end_date
 
+        if active_package_name == 'Normal Package':
+            char_limit = 5000
+        elif active_package_name == 'Pro Package':
+            char_limit = None  
+
     username = request.user.name
     money = request.user.money
     
-    loc = None  # Khởi tạo biến `loc` cho việc truyền kết quả file âm thanh
+    # Xóa file cũ nếu tồn tại trong session
+    loc = request.session.get('loc')
+    if loc:
+        old_file_path = os.path.join(settings.BASE_DIR, "static/sound", loc)
+        if os.path.exists(old_file_path):
+            os.remove(old_file_path)  # Xóa file cũ
+        del request.session['loc']  # Xóa khỏi session
 
     if request.method == "POST":
         letters = string.ascii_lowercase
-
         file_name = f"{''.join(random.choice(letters) for i in range(10))}.mp3"
 
         text = request.POST['text']
@@ -64,16 +138,20 @@ def get_index(request): # trang dùng tool
 
         dir = os.getcwd()
         full_dir = os.path.join(dir, file_name)
-        print(dir)
-        print(full_dir)
 
-        # Di chuyển file vào thư mục tĩnh
+        # Di chuyển file vào thư mục static/sound/
         dest = shutil.move(full_dir, os.path.join(dir, "static/sound/"))
-        
-        # Lưu tên file vào biến loc để hiển thị trên trang
-        loc = file_name
 
-    return render(request, 'index.html', {'username': username, 'customer_value': money, 'package': {'name': active_package_name, 'start': active_package_start_date, 'end': active_package_end_date}, 'loc': loc})
+        # Lưu tên file vào session
+        request.session['loc'] = file_name
+        loc = file_name
+    return render(request, 'index.html', {
+        'username': username, 
+        'customer_value': money, 
+        'package': {'name': active_package_name, 'start': active_package_start_date, 'end': active_package_end_date}, 
+        'char_limit': char_limit, 
+        'loc': loc
+    })
 
 def get_money(request): # nạp tiền
     if not request.user.is_authenticated:
@@ -207,7 +285,9 @@ def buy_package(request):
 
 
     # Lấy tất cả các gói dịch vụ
-    packages = Package.objects.all()
+    # packages = Package.objects.all()
+    packages = Package.objects.filter(Q(name="Normal Package") | Q(name="Pro Package"))
+
     return render(request, 'tem_payment/payment_base.html', {'username': name_user, 'packages': packages, 'customer_value': money})
 
 # Hàm đăng ký người dùng
@@ -218,22 +298,23 @@ def register(request):
             # Lưu người dùng mới vào cơ sở dữ liệu
             user = form.save()
 
-            # Tạo Subscription với ID_Pack=1 (Active = 1)
-            try:
-                package = Package.objects.get(id=1)  # ID 1 là gói mặc định
-                start_date = timezone.now().date()
-                end_date = start_date + timedelta(package.duration)  # Ví dụ: thuê bao trong 30 ngày
-                subscription = Subscription.objects.create(
-                    customer=user,
-                    package=package,
-                    start_date=start_date,
-                    end_date=end_date,
-                    status=True  # Active = 1
-                )
-            except Package.DoesNotExist:
-                print("Package with ID=1 does not exist.")
-                
-                
+            # Kiểm tra xem người dùng đã có Subscription chưa
+            if not Subscription.objects.filter(customer=user).exists():
+                # Tạo Subscription với ID_Pack=1 (Active = 1)
+                try:
+                    package = Package.objects.get(id=1)  # ID 1 là gói mặc định
+                    start_date = timezone.now().date()
+                    end_date = start_date + timedelta(package.duration)  # Ví dụ: thuê bao trong 30 ngày
+                    subscription = Subscription.objects.create(
+                        customer=user,
+                        package=package,
+                        start_date=start_date,
+                        end_date=end_date,
+                        status=True  # Active = 1
+                    )
+                except Package.DoesNotExist:
+                    print("Package with ID=1 does not exist.")
+            
             # Đăng nhập người dùng sau khi đăng ký
             auth_login(request, user)
 
