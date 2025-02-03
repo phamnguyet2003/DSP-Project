@@ -1,8 +1,11 @@
 1. Active môi trường ảo
     myenv\Scripts\activate
 
-2. Vào thư mục Project
-cd tts_project
+2. Cài đặt môi trường
+    pip install -r requirements.txt
 
-3. Chạy app 
-python manage.py runserver
+3. Vào thư mục Project
+    cd tts_project
+
+4. Chạy app 
+    python manage.py runserver
