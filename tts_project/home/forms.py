@@ -9,7 +9,12 @@ class RegisterForm(UserCreationForm):
     class Meta:
         model = Customer
         fields = ['username', 'email', 'name', 'phone']
-
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Username'})
+        self.fields['email'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Email Address'})
+        self.fields['password1'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Enter Password'})
+        self.fields['password2'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Confirm Password'})
     def clean_phone(self):
         phone = self.cleaned_data.get('phone')
         # Thêm validation cho số điện thoại nếu cần

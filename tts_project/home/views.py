@@ -9,6 +9,11 @@ from datetime import timedelta
 from django.core.cache import cache
 from django.contrib.auth import logout
 from django.db.models import Q
+import os
+import shutil
+import random
+import string
+from django.conf import settings
 
 # model
 from gtts import gTTS
@@ -20,7 +25,7 @@ import shutil
 def get_home(request):
     
     if not request.user.is_authenticated:
-        return redirect('login')  # Hoặc trang đăng nhập của bạn
+        return render(request, 'home_not_log_in.html')  # Hoặc trang đăng nhập của bạn
     username = request.user.name
     money = request.user.money
 
@@ -33,64 +38,6 @@ def get_payments(request): # mua gói cước
     money = request.user.money
     
     return render(request, 'payments.html', {'username':username, 'customer_value': money})
-
-# def get_index(request): # trang dùng tool
-#     if not request.user.is_authenticated:
-#         return redirect('login')  # Hoặc trang đăng nhập của bạn
-#     customer = Customer.objects.get(username=request.user.username)
-    
-#     # Lấy gói dịch vụ active của người dùng
-#     active_subscription = Subscription.objects.filter(customer=customer, status=True).first()
-#     if active_subscription:
-#         active_package_name = active_subscription.package.name 
-#         active_package_start_date = active_subscription.start_date 
-#         active_package_end_date = active_subscription.end_date
-
-#         if active_package_name == 'Free Package':
-#             char_limit = 500
-#         elif active_package_name == 'Normal Package':
-#             char_limit = 5000
-#         elif active_package_name >= 'Pro Package':
-#             char_limit = None  # Không giới hạn
-
-#     username = request.user.name
-#     money = request.user.money
-    
-#     loc = None  # Khởi tạo biến `loc` cho việc truyền kết quả file âm thanh
-
-#     if request.method == "POST":
-#         letters = string.ascii_lowercase
-
-#         file_name = f"{''.join(random.choice(letters) for i in range(10))}.mp3"
-
-#         text = request.POST['text']
-#         tdl = request.POST['tdl']
-#         lang = request.POST['lang']
-
-#         tts = gTTS(text, lang=lang, tld=tdl)
-#         tts.save(file_name)
-
-#         dir = os.getcwd()
-#         full_dir = os.path.join(dir, file_name)
-#         print(dir)
-#         print(full_dir)
-
-#         # Di chuyển file vào thư mục tĩnh
-#         dest = shutil.move(full_dir, os.path.join(dir, "static/sound/"))
-        
-#         # Lưu tên file vào biến loc để hiển thị trên trang
-#         loc = file_name
-
-#     return render(request, 'index.html', {'username': username, 'customer_value': money, 'package': {'name': active_package_name, 'start': active_package_start_date, 'end': active_package_end_date}, 'char_limit':char_limit, 'loc': loc})
-
-import os
-import shutil
-import random
-import string
-from django.shortcuts import render, redirect
-from gtts import gTTS
-from django.conf import settings
-from .models import Customer, Subscription
 
 def get_index(request):  
     if not request.user.is_authenticated:
@@ -234,19 +181,19 @@ def buy_package(request):
         try:
             package = Package.objects.get(id=package_id)
         except Package.DoesNotExist:
-            messages.error(request, 'Gói dịch vụ không tồn tại.')
+            # messages.error(request, 'Gói dịch vụ không tồn tại.')
             return redirect('buy_package')
 
         # Lấy customer theo username
         try:
             customer = Customer.objects.get(username=request.user.username)
         except Customer.DoesNotExist:
-            messages.error(request, 'Khách hàng không tồn tại.')
+            # messages.error(request, 'Khách hàng không tồn tại.')
             return redirect('buy_package')
 
         # Kiểm tra số dư của khách hàng
         if customer.money < package.price:
-            messages.error(request, 'Số dư trong tài khoản không đủ.')
+            # messages.error(request, 'Số dư trong tài khoản không đủ.')
             return redirect('buy_package')
 
         # # Kiểm tra hành động người dùng đã chọn (Xác nhận mua hoặc Hủy)
@@ -276,11 +223,11 @@ def buy_package(request):
         try:
             customer.save()
             print('confirm_button')
-            messages.success(request, f"Chúc mừng {customer.name}, bạn đã mua gói {package.name} thành công!")
+            # messages.success(request, f"Chúc mừng {customer.name}, bạn đã mua gói {package.name} thành công!")
             return redirect('index')
 
         except Exception as e:
-            messages.error(request, f"Có lỗi xảy ra khi cập nhật số dư: {str(e)}")
+            # messages.error(request, f"Có lỗi xảy ra khi cập nhật số dư: {str(e)}")
             return redirect('home')
 
 

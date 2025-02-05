@@ -38,7 +38,7 @@ class Subscription(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Subscription for {self.customer.name} to {self.package.language}"
+        return f"Subscription for {self.customer.name} to {self.package.name}"
 
 
 # Payment model: Lưu thông tin thanh toán tiền trong hệ thống mà khách hàng dùng mua gói cước
