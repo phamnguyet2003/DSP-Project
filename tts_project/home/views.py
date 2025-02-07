@@ -25,11 +25,14 @@ import shutil
 def get_home(request):
     
     if not request.user.is_authenticated:
-        return render(request, 'home_not_log_in.html')  # Hoặc trang đăng nhập của bạn
+        customers_count = Customer.objects.count()
+        return render(request, 'home_not_log_in.html', { "customers_count": customers_count})  # Hoặc trang đăng nhập của bạn
+    
+    customers_count = Customer.objects.count()
     username = request.user.name
     money = request.user.money
 
-    return render(request, 'home.html', {'username':username, 'customer_value': money})
+    return render(request, 'home.html', {'username':username, 'customer_value': money, "customers_count": customers_count})
 
 def get_payments(request): # mua gói cước
     if not request.user.is_authenticated:
@@ -295,5 +298,5 @@ def login(request):
 
 def logout_view(request):
     logout(request)  # Đăng xuất người dùng
-    return redirect('login')  # Chuyển hướng về trang chủ sau khi đăng xuất
+    return redirect('home')  # Chuyển hướng về trang chủ sau khi đăng xuất
 

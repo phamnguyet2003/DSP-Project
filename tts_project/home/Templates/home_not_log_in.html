@@ -1,27 +1,6 @@
-{% extends "base.html" %}
+{% extends "home.html" %}
 {% load static %}
-{% block main-content %}
-  <main class="main">
-    <!-- Hero Section -->
-    <section id="hero" class="hero section">
-
-      <img src="static\assets\img\portfolio\bìa.jpg" alt="" data-aos="fade-in" style="filter: blur(5px);">
-
-      <div class="container text-center" data-aos="zoom-out" data-aos-delay="100">
-        <div class="row justify-content-center">
-          <div class="col-lg-8">
-            <h2>CHAMELEON VOICE</h2>
-            <p>I'm a professional Text to Speech Tools for Vietnamese!</p>
-            <a href="{% url 'index' %}" class="btn-get-started">Try</a>
-          </div>
-        </div>
-      </div>
-
-    </section><!-- /Hero Section -->
-
-  </main>
 {% block user_dropdown %}
-<!-- Không hiển thị gì -->
+<li><a href="{% url 'login' %}" class="{% if request.path == '/login/' %}active{% endif %}">Đăng nhập</a></li>
+<li><a href="{% url 'register' %}" class="{% if request.path == '/register/' %}active{% endif %}">Đăng ký</a></li>
 {% endblock %}
-
-{% endblock main-content %}
