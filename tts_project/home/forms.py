@@ -18,7 +18,15 @@ class RegisterForm(UserCreationForm):
     def clean_phone(self):
         phone = self.cleaned_data.get('phone')
         # Thêm validation cho số điện thoại nếu cần
+        if Customer.objects.filter(phone=phone).exists():
+            raise forms.ValidationError("A user with that phone already exists.")
         return phone
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        # Thêm validation cho số điện thoại nếu cần
+        if Customer.objects.filter(email=email).exists():
+            raise forms.ValidationError("A user with that email already exists.")
+        return email
 
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=150, required=True)
