@@ -5,7 +5,7 @@ from django.utils.timezone import now
 # Customer model: Lưu thông tin khách hàng
 class Customer(AbstractUser):
     name = models.CharField(max_length=150, blank=True, null=True)  # Thêm blank=True, null=True để tránh lỗi bắt buộc
-    phone = models.CharField(max_length=15, blank=True, null=True)
+    phone = models.CharField(max_length=15, unique=True, blank=True, null=True)
     money = models.IntegerField(default=0)
     REQUIRED_FIELDS = ['name', 'phone']
     def __str__(self):

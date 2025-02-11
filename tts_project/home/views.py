@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import get_user_model, authenticate, login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
-from .forms import RegisterForm, LoginForm, EditProfileForm
+from .forms import RegisterForm, LoginForm, EditProfileForm , CustomPasswordResetForm
 from .models import *
 from datetime import timedelta
 from django.core.cache import cache
@@ -21,7 +21,40 @@ import string
 import random
 import os
 import shutil
+
+# forgot password
+from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView
+
 # Create your views here.
+
+# User = get_user_model()
+
+class CustomPasswordResetView(PasswordResetView):
+    form_class = CustomPasswordResetForm
+    template_name = 'password_reset.html'  # Đảm bảo đây là template đúng
+    def form_valid(self, form):
+        email = form.cleaned_data.get("email", "")
+        
+        # Che một phần email để bảo mật
+        at_index = email.find('@')
+        if at_index > 3:
+            masked_email = '*' * (at_index - 3) + email[at_index - 3:]
+        else:
+            masked_email = email  # Nếu email quá ngắn thì giữ nguyên
+
+        # Lưu vào session để sử dụng ở trang `password_reset_done.html`
+        self.request.session['masked_email'] = masked_email
+
+        return super().form_valid(form)
+    
+class CustomPasswordResetDoneView(PasswordResetDoneView):
+    template_name = 'password_reset_done.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['masked_email'] = self.request.session.get('masked_email', '')
+        return context
+    
 def get_home(request):
     
     if not request.user.is_authenticated:
@@ -239,6 +272,8 @@ def buy_package(request):
     packages = Package.objects.filter(Q(name="Normal Package") | Q(name="Pro Package"))
 
     return render(request, 'tem_payment/payment_base.html', {'username': name_user, 'packages': packages, 'customer_value': money})
+
+
 
 # Hàm đăng ký người dùng
 def register(request):

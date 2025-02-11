@@ -1,5 +1,16 @@
 {% extends "base.html" %}
 {% load static %}
+{% block spacer-block %}
+<style>
+  .spacer {
+    height: 170px; 
+    visibility: hidden; /* Không hiển thị nhưng vẫn chiếm không gian */
+}
+.form-group{
+    padding: 4px;
+  }
+</style>
+{% endblock spacer-block %}
 {% block main-content %}
  <div class="form-content my-3 p-3">
   <div class="container">
@@ -21,7 +32,7 @@
                           </button>
                       </div>
                   {% endif %}
-                  <div class="card-body">
+                  <div class="card-body text-center">
                       <form method="POST">
                           {% csrf_token %}
                           <div class="form-row">
@@ -44,7 +55,7 @@
                           <div class="form-row">
                               <div class="col-md-10 offset-md-1">
                                   <div class="form-group mt-0 mb-1">
-                                    <button name="login" class="col-md-12 btn btn-dark" id="login">Sign in</button>
+                                    <button name="login" class="btn btn-dark btn-primary" id="login">Sign in</button>
                                   </div>
                               </div>
                           </div>
@@ -53,7 +64,7 @@
                   <div class="card-footer text-center">
                       <div class="small">
                           <a href="{% url 'register' %}">Don't have an account yet? Go to signup</a><br>
-                          {% comment %} <a href="{% url 'password_reset' %}"><i>Forgot Password?</i></a> {% endcomment %}
+                          <a href="{% url 'password_reset' %}"><i>Forgot Password?</i></a>
                       </div>
                   </div>
               </div>
@@ -61,6 +72,8 @@
       </div>
   </div>
 </div> 
+<div class="spacer"></div>
+
 {% block user_dropdown %}
 <!-- Không hiển thị gì -->
 {% endblock %}

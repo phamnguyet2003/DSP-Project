@@ -27,14 +27,7 @@
 
   <!-- Main CSS File -->
   <link href="{% static 'assets/css/main.css' %}" rel="stylesheet">
-
-  <!-- =======================================================
-  * Template Name: Kelly
-  * Template URL: https://bootstrapmade.com/kelly-free-bootstrap-cv-resume-html-template/
-  * Updated: Aug 07 2024 with Bootstrap v5.3.3
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
+  {% block spacer-block %}{% endblock spacer-block %}
 </head>
 
 <body class="index-page">
@@ -94,11 +87,9 @@
 
     </div>
   </header>
-
-  
-  {% block main-content %}{% endblock main-content %}
-
-
+  <div class="content-wrapper">
+    {% block main-content %}{% endblock main-content %}
+  </div>
   <footer id="footer" class="footer light-background">
 
     <div class="container">
