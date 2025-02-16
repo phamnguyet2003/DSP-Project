@@ -75,6 +75,13 @@ def submit_input(request):
     active_subscription = Subscription.objects.filter(customer=customer, status=True).first()
 
     if request.method == "POST" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        # Xóa file cũ nếu có
+        old_loc = request.session.get('loc')
+        if old_loc:
+            old_file_path = os.path.join(settings.BASE_DIR, "static/sound", old_loc)
+            if os.path.exists(old_file_path):
+                os.remove(old_file_path)  # Xóa file cũ
+            del request.session['loc']  # Xóa khỏi session
         letters = string.ascii_lowercase
         file_name = f"{''.join(random.choice(letters) for i in range(10))}.mp3"
 
