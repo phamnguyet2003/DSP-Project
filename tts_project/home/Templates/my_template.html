@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Input</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        #output { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>Nhập nội dung vào form</h2>
+    <form id="myForm">
+        <input type="text" id="textInput" placeholder="Nhập nội dung..." required>
+        <button type="submit">Gửi</button>
+    </form>
+    <div id="output"></div>
+
+    <script>
+        document.getElementById("myForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Ngăn tải lại trang
+            let inputText = document.getElementById("textInput").value;
+            document.getElementById("output").textContent = "Kết quả: " + inputText;
+            document.getElementById("textInput").value = ""; // Xóa ô input sau khi gửi
+        });
+    </script>
+</body>
+</html>

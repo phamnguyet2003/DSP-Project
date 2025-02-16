@@ -19,8 +19,12 @@ from django.urls import path
 from home import views
 from django.contrib.auth import views as auth_views
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path("admin/", admin.site.urls),  
     path("", views.get_home, name='home'),
+    
+    # path("test/", views.test, name='test'),
+    path("submit-input/", views.submit_input, name='submit_input'),  # Xử lý AJAX for
+    
     path("index/", views.get_index, name='index'),
     path("instruction/", views.get_instruction, name='instruction'),
     path("money/", views.get_money, name='money'),

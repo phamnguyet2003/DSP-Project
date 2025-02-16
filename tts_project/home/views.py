@@ -14,21 +14,123 @@ import shutil
 import random
 import string
 from django.conf import settings
+from django.urls import reverse
+import zipfile
 
 # model
 from gtts import gTTS
-import string
-import random
-import os
-import shutil
 
 # forgot password
 from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView
 
+############
+# Chỉ thay đổi 1 phần html, không load lại cả trang
+from django.http import JsonResponse
+
+
+def get_index(request):
+    if not request.user.is_authenticated:
+        return redirect('login')  
+
+    customer = Customer.objects.get(username=request.user.username)
+    active_subscription = Subscription.objects.filter(customer=customer, status=True).first()
+
+    char_limit = 500  # Mặc định cho gói Free
+    active_package_name = None
+    active_package_start_date = None
+    active_package_end_date = None
+
+    if active_subscription:
+        active_package_name = active_subscription.package.name 
+        active_package_start_date = active_subscription.start_date 
+        active_package_end_date = active_subscription.end_date
+
+        if active_package_name == 'Normal Package':
+            char_limit = 5000
+        elif active_package_name == 'Pro Package':
+            char_limit = None  
+
+    username = request.user.name
+    money = request.user.money
+    
+    # Xóa file cũ nếu tồn tại trong session
+    loc = request.session.get('loc')
+    if loc:
+        old_file_path = os.path.join(settings.BASE_DIR, "static/sound", loc)
+        if os.path.exists(old_file_path):
+            os.remove(old_file_path)  # Xóa file cũ
+        del request.session['loc']  # Xóa khỏi session
+        
+    return render(request, 'index.html', {
+        'username': username, 
+        'customer_value': money, 
+        'package': {'name': active_package_name, 'start': active_package_start_date, 'end': active_package_end_date}, 
+        'char_limit': char_limit, 
+        'loc': loc
+    })
+    # return render(request, "test.html")
+
+def submit_input(request):
+    customer = Customer.objects.get(username=request.user.username)
+    active_subscription = Subscription.objects.filter(customer=customer, status=True).first()
+
+    if request.method == "POST" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        letters = string.ascii_lowercase
+        file_name = f"{''.join(random.choice(letters) for i in range(10))}.mp3"
+
+        text = request.POST['text']
+        tdl = request.POST['tdl']
+        lang = request.POST['lang']
+
+        tts = gTTS(text, lang=lang, tld=tdl)
+        tts.save(file_name)
+
+        # Đường dẫn thư mục
+        base_dir = os.getcwd()
+        sound_dir = os.path.join(base_dir, "static/sound/")
+        input_dir = os.path.join(base_dir, "static/history/input_text/")
+        output_dir = os.path.join(base_dir, "static/history/output_audio/")
+
+        # Đảm bảo thư mục tồn tại
+        os.makedirs(sound_dir, exist_ok=True)
+        os.makedirs(output_dir, exist_ok=True)
+
+        # Di chuyển file MP3 vào static/sound/
+        mp3_path = shutil.move(file_name, sound_dir)
+
+        # Tạo file ZIP
+        zip_name = f"{os.path.splitext(file_name)[0]}.zip"
+        zip_path = os.path.join(output_dir, zip_name)
+
+        with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+            zipf.write(mp3_path, os.path.basename(mp3_path))
+            
+        # Lưu file ZIP chứa input_text.txt
+        text_zip_path = os.path.join(input_dir, zip_name)
+        with zipfile.ZipFile(text_zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+            zipf.writestr("input_text.txt", text)
+
+        # Lưu tên file vào session
+        request.session['loc'] = file_name
+        loc = file_name
+        
+        # Lưu vào History
+        History.objects.create(
+            customer=customer,
+            timestamp=now(),
+            input_text=" ".join(text.split()[:10]) + "...",  # 10 từ đầu tiên
+            text_file=zip_name, # static\history\input_text
+            voice_file=zip_name, # static\history\output_audio
+            package=active_subscription.package
+        )
+        return JsonResponse({"success": True, "loc": file_name}) # Trả về danh sách dữ liệu đã nộp
+
+############
+
+
+
+
 # Create your views here.
-
-# User = get_user_model()
-
 class CustomPasswordResetView(PasswordResetView):
     form_class = CustomPasswordResetForm
     template_name = 'password_reset.html'  # Đảm bảo đây là template đúng
@@ -74,67 +176,6 @@ def get_payments(request): # mua gói cước
     money = request.user.money
     
     return render(request, 'payments.html', {'username':username, 'customer_value': money})
-
-def get_index(request):  
-    if not request.user.is_authenticated:
-        return redirect('login')  
-
-    customer = Customer.objects.get(username=request.user.username)
-    active_subscription = Subscription.objects.filter(customer=customer, status=True).first()
-
-    char_limit = 500  # Mặc định cho gói Free
-    active_package_name = None
-    active_package_start_date = None
-    active_package_end_date = None
-
-    if active_subscription:
-        active_package_name = active_subscription.package.name 
-        active_package_start_date = active_subscription.start_date 
-        active_package_end_date = active_subscription.end_date
-
-        if active_package_name == 'Normal Package':
-            char_limit = 5000
-        elif active_package_name == 'Pro Package':
-            char_limit = None  
-
-    username = request.user.name
-    money = request.user.money
-    
-    # Xóa file cũ nếu tồn tại trong session
-    loc = request.session.get('loc')
-    if loc:
-        old_file_path = os.path.join(settings.BASE_DIR, "static/sound", loc)
-        if os.path.exists(old_file_path):
-            os.remove(old_file_path)  # Xóa file cũ
-        del request.session['loc']  # Xóa khỏi session
-
-    if request.method == "POST":
-        letters = string.ascii_lowercase
-        file_name = f"{''.join(random.choice(letters) for i in range(10))}.mp3"
-
-        text = request.POST['text']
-        tdl = request.POST['tdl']
-        lang = request.POST['lang']
-
-        tts = gTTS(text, lang=lang, tld=tdl)
-        tts.save(file_name)
-
-        dir = os.getcwd()
-        full_dir = os.path.join(dir, file_name)
-
-        # Di chuyển file vào thư mục static/sound/
-        dest = shutil.move(full_dir, os.path.join(dir, "static/sound/"))
-
-        # Lưu tên file vào session
-        request.session['loc'] = file_name
-        loc = file_name
-    return render(request, 'index.html', {
-        'username': username, 
-        'customer_value': money, 
-        'package': {'name': active_package_name, 'start': active_package_start_date, 'end': active_package_end_date}, 
-        'char_limit': char_limit, 
-        'loc': loc
-    })
 
 def get_money(request): # nạp tiền
     if not request.user.is_authenticated:
@@ -186,7 +227,9 @@ def get_history_use(request): # lịch sử dùng
         return redirect('login')  # Hoặc trang đăng nhập của bạn
     username = request.user.name
     money = request.user.money
-    return render(request, 'history_use.html', {'username':username, 'customer_value': money})
+    use_history = History.objects.filter(customer=request.user).order_by('-timestamp')  # Giả sử có trường `date`
+    
+    return render(request, 'history_use.html', {'username':username, 'customer_value': money, 'use_history': use_history})
 
 def get_history_buy(request): # lịch sử mua
     if not request.user.is_authenticated:
@@ -272,8 +315,6 @@ def buy_package(request):
     packages = Package.objects.filter(Q(name="Normal Package") | Q(name="Pro Package"))
 
     return render(request, 'tem_payment/payment_base.html', {'username': name_user, 'packages': packages, 'customer_value': money})
-
-
 
 # Hàm đăng ký người dùng
 def register(request):

@@ -53,16 +53,25 @@ class Payment(models.Model):
 
 # History model: Lưu thông tin sử dụng dịch vụ của khách hàng
 class History(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    date = models.DateField()
-    input_data = models.TextField()
-    output_data = models.TextField()
+    customer = models.ForeignKey('Customer', on_delete=models.CASCADE, related_name="histories")
+    timestamp = models.DateTimeField(default=now)  # Ghi lại thời gian chi tiết hơn
+    input_text = models.TextField()  # Lưu text đầu vào 10 chữ đầu tiên
+    text_file = models.FileField(blank=True, null=True)  # Lưu file audio
+    voice_file = models.FileField(upload_to="tts_outputs/", blank=True, null=True)  # Lưu file audio
+    package = models.ForeignKey('Package', on_delete=models.SET_NULL, null=True, blank=True)  # Tham chiếu đến bảng Package
+
+    class Meta:
+        ordering = ['-timestamp']  # Sắp xếp mới nhất lên đầu
+        indexes = [
+            models.Index(fields=['timestamp']),
+            models.Index(fields=['customer']),
+        ]
 
     def __str__(self):
-        return f"History for {self.customer.name} on {self.date}"
+        return f"History for {self.customer.name} on {self.timestamp.strftime('%Y-%m-%d %H:%M:%S')}"
 
 
-# Wallet model: Lưu tiền khách chuyển vào hệ thống
+# Wallet model: Lưu tiền khách chuyển vào ngân hàng
 class Wallet(models.Model):
     customer = models.ForeignKey('Customer', on_delete=models.CASCADE)
     transaction_date = models.DateTimeField(default=now)

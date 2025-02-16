@@ -2,27 +2,9 @@
 {% load static %}
 {% block main-content %}
 <main class="main">
-
-  <section id="hero" class="hero section text-center py-2" style="min-height: 120px; padding: 10px 0;">
-    <div class="container" data-aos="zoom-out" data-aos-delay="100">
-      <div class="row justify-content-center">
-        <div class="col-lg-5"> <!-- Thu nhỏ hơn nữa -->
-          <!-- Hiển thị thông tin gói dịch vụ nếu có -->
-          {% if package.name %}
-            <p class="text-success fw-bold small mb-1">Gói hiện tại: {{ package.name }}</p>
-            <p class="small mb-0">Thời gian: {{ package.start|date:"Y-m-d" }} tới {{ package.end|date:"Y-m-d" }}</p>
-          {% else %}
-            <p class="text-danger small mb-0">Chưa có gói dịch vụ nào.</p>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-  </section><!-- /Hero Section -->
-
   <div class="container my-4">
-    <div class="row justify-content-between"> <!-- Chia màn hình thành 2 phần -->
+    <div class="row justify-content-between">
       
-      <!-- Input Section -->
       <!-- Input Section -->
       <div class="col-md-5">
         <h3 class="text-center mb-4">Input</h3>
@@ -102,58 +84,52 @@
   </div>
 
 </main>
+
 <script>
   document.addEventListener("DOMContentLoaded", function() {
-    const form = document.getElementById("ttsForm");
-    const outputSection = document.getElementById("output-section");
-    const textarea = document.getElementById("text_area");
-    const charCount = document.getElementById("char_count");
-    const charLimit = {{ char_limit|default:"null" }};  // Nhận giá trị từ Django
+      const form = document.getElementById("ttsForm");
+      const outputSection = document.getElementById("output-section");
+      const charCount = document.getElementById("char_count");
+      const textarea = document.getElementById("text_area");
 
-    // Cập nhật số ký tự nhập vào
-    textarea.addEventListener("input", function() {
-        charCount.textContent = textarea.value.length;
-    });
+      textarea.addEventListener("input", function() {
+          charCount.textContent = textarea.value.length;
+      });
 
-    // Nếu không giới hạn ký tự, xóa thuộc tính maxlength
-    if (charLimit === null) {
-        textarea.removeAttribute("maxlength");
-    }
+      form.addEventListener("submit", function(event) {
+          event.preventDefault(); // Ngăn form reload trang
 
-    // Xử lý gửi form bằng AJAX
-    form.addEventListener("submit", function(event) {
-        event.preventDefault(); // Ngăn form reload trang
-
-        const formData = new FormData(form);
-        
-        fetch("{% url 'submit_input' %}", {
-            method: "POST",
-            body: formData,
-            headers: {
-                "X-Requested-With": "XMLHttpRequest"
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                outputSection.innerHTML = `
-                  <div class="alert alert-success" role="alert">
-                      Your File is Ready to 
-                      <a id="download-link" href="/static/sound/${data.loc}" download>Download</a>
-                  </div>
-                  <div class="text-center">
-                      <audio id="audio-player" controls style="width: 100%;">
-                          <source id="audio-source" src="/static/sound/${data.loc}" type="audio/mp3">
-                          Your browser does not support the audio element.
-                      </audio>
-                  </div>
-                `;
-            } else {
-                outputSection.innerHTML = `<div class="alert alert-danger">Error generating audio!</div>`;
-            }
-        })
-        .catch(error => console.error("Error:", error));
-    });
-});
+          const formData = new FormData(form);
+          
+          fetch("{% url 'submit_input' %}", {
+              method: "POST",
+              body: formData,
+              headers: {
+                  "X-Requested-With": "XMLHttpRequest"
+              }
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  outputSection.innerHTML = `
+                    <div class="alert alert-success" role="alert">
+                        Your File is Ready to 
+                        <a id="download-link" href="/static/sound/${data.loc}" download>Download</a>
+                    </div>
+                    <div class="text-center">
+                        <audio id="audio-player" controls style="width: 100%;">
+                            <source id="audio-source" src="/static/sound/${data.loc}" type="audio/mp3">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                  `;
+              } else {
+                  outputSection.innerHTML = `<div class="alert alert-danger">Error generating audio!</div>`;
+              }
+          })
+          .catch(error => console.error("Error:", error));
+      });
+  });
 </script>
+
 {% endblock %}

@@ -1,84 +1,65 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block main-content %}
 <main class="main">
 
-  <!-- Resume Section -->
-  <section id="resume" class="resume section">
-
-    <!-- Section Title -->
-    <div class="container section-title" data-aos="fade-up">
-      <h2>Resume</h2>
-      <p>Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p>
+  <!-- Section Title -->
+  <section id="history" class="history section">
+    <div class="container section-title text-center" data-aos="fade-up">
+      <h2 class="section-title-heading">Lịch Sử Sử Dụng</h2>
+      <p class="section-title-description">Xem lịch sử sử dụng của bạn:</p>
     </div><!-- End Section Title -->
 
     <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-8" data-aos="fade-up" data-aos-delay="100">
 
-      <div class="row">
+          <!-- Lịch sử sử dụng -->
+          <div class="history-item mb-4">
+            <h3 class="history-item-title">Lịch Sử Sử Dụng</h3>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Ngày</th>
+                  <th>Text</th>
+                  <th>Tải file text</th>
+                  <th>Voice</th>
+                  <th>Gói</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for history in use_history %}
+                <tr>
+                  <td>{{ history.timestamp }}</td>
+                  <td>{{ history.input_text }}</td> <!-- Tên gói từ bảng Package -->
+                  <td>
+                    <a href="{% static 'history/input_text/' %}{{ history.text_file }}" download>
+                      Tải file text đầy đủ
+                    </a>  
+                  </td> <!-- Giá trị giao dịch -->
+                  <td>
+                    <a href="{% static 'history/output_audio/' %}{{ history.voice_file }}" download>
+                      Tải file audio
+                    </a>  
+                  </td> <!-- Giá trị giao dịch -->
+                  <td>{{ history.package.name }} </td> <!-- Giá trị giao dịch -->
 
-        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
-          <h3 class="resume-title">Sumary</h3>
-
-          <div class="resume-item pb-0">
-            <h4>Brandon Johnson</h4>
-            <p><em>Innovative and deadline-driven Graphic Designer with 3+ years of experience designing and developing user-centered digital/print marketing material from initial concept to final, polished deliverable.</em></p>
-            <ul>
-              <li>Portland par 127,Orlando, FL</li>
-              <li>(123) 456-7891</li>
-              <li>alice.barkley@example.com</li>
-            </ul>
-          </div><!-- Edn Resume Item -->
-
-          <h3 class="resume-title">Education</h3>
-          <div class="resume-item">
-            <h4>Master of Fine Arts &amp; Graphic Design</h4>
-            <h5>2015 - 2016</h5>
-            <p><em>Rochester Institute of Technology, Rochester, NY</em></p>
-            <p>Qui deserunt veniam. Et sed aliquam labore tempore sed quisquam iusto autem sit. Ea vero voluptatum qui ut dignissimos deleniti nerada porti sand markend</p>
-          </div><!-- Edn Resume Item -->
-
-          <div class="resume-item">
-            <h4>Bachelor of Fine Arts &amp; Graphic Design</h4>
-            <h5>2010 - 2014</h5>
-            <p><em>Rochester Institute of Technology, Rochester, NY</em></p>
-            <p>Quia nobis sequi est occaecati aut. Repudiandae et iusto quae reiciendis et quis Eius vel ratione eius unde vitae rerum voluptates asperiores voluptatem Earum molestiae consequatur neque etlon sader mart dila</p>
-          </div><!-- Edn Resume Item -->
-
-        </div>
-
-        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
-          <h3 class="resume-title">Professional Experience</h3>
-          <div class="resume-item">
-            <h4>Senior graphic design specialist</h4>
-            <h5>2019 - Present</h5>
-            <p><em>Experion, New York, NY </em></p>
-            <ul>
-              <li>Lead in the design, development, and implementation of the graphic, layout, and production communication materials</li>
-              <li>Delegate tasks to the 7 members of the design team and provide counsel on all aspects of the project. </li>
-              <li>Supervise the assessment of all graphic materials in order to ensure quality and accuracy of the design</li>
-              <li>Oversee the efficient use of production project budgets ranging from $2,000 - $25,000</li>
-            </ul>
-          </div><!-- Edn Resume Item -->
-
-          <div class="resume-item">
-            <h4>Graphic design specialist</h4>
-            <h5>2017 - 2018</h5>
-            <p><em>Stepping Stone Advertising, New York, NY</em></p>
-            <ul>
-              <li>Developed numerous marketing programs (logos, brochures,infographics, presentations, and advertisements).</li>
-              <li>Managed up to 5 projects or tasks at a given time while under pressure</li>
-              <li>Recommended and consulted with clients on the most appropriate graphic design</li>
-              <li>Created 4+ design presentations and proposals a month for clients and account managers</li>
-            </ul>
-          </div><!-- Edn Resume Item -->
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="3">Chưa có lịch sử sử dụng.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
 
         </div>
-
       </div>
-
     </div>
 
-  </section><!-- /Resume Section -->
+  </section><!-- /Lịch sử giao dịch -->
 
 </main>
 {% endblock main-content %}
