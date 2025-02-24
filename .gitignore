@@ -4,7 +4,9 @@
 __pycache__
 db.sqlite3
 
-static/Sound/*.mp3
+tts_project/static/Sound/*
+tts_project/static/history/*
+
 note.txt
 tasks.txt
 

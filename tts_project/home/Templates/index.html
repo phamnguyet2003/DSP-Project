@@ -86,13 +86,13 @@
           {% if loc %}
             <div class="alert alert-success" role="alert">
                 Your File is Ready to 
-                <a id="download-link" href="{% static 'sound/' %}{{ loc }}" download>Download</a>
+                <a id="download-link" href="{{ media_url }}/sound/{{ loc }}" download>Download</a>
             </div>
             <div class="text-center">
-                <audio id="audio-player" controls style="width: 100%;">
-                    <source id="audio-source" src="{% static 'sound/' %}{{ loc }}" type="audio/mp3">
-                    Your browser does not support the audio element.
-                </audio>
+              <audio id="audio-player" controls style="width: 100%;">
+                <source id="audio-source" src="{{ media_url }}/sound/{{ loc }}" type="audio/mp3">
+                Your browser does not support the audio element.
+              </audio>
             </div>
           {% endif %}
         </div>
@@ -139,11 +139,11 @@
                 outputSection.innerHTML = `
                   <div class="alert alert-success" role="alert">
                       Your File is Ready to 
-                      <a id="download-link" href="/static/sound/${data.loc}" download>Download</a>
+                      <a id="download-link" href="/media/sound/${data.loc}" download>Download</a>
                   </div>
                   <div class="text-center">
                       <audio id="audio-player" controls style="width: 100%;">
-                          <source id="audio-source" src="/static/sound/${data.loc}" type="audio/mp3">
+                          <source id="audio-source" src="/media/sound/${data.loc}" type="audio/mp3">
                           Your browser does not support the audio element.
                       </audio>
                   </div>

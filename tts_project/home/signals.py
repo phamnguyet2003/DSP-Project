@@ -4,7 +4,10 @@ from .models import Customer, Wallet, Subscription, Package
 from django.utils import timezone
 from datetime import timedelta
 from django.utils.timezone import now
+from django.contrib.auth.signals import user_logged_in, user_logged_out
+import logging
 
+logger = logging.getLogger('django')
 @receiver(post_save, sender=Customer)
 def create_wallet_and_subscription(sender, instance, created, **kwargs):
     if created:
@@ -31,3 +34,11 @@ def check_and_update_subscriptions(sender, **kwargs):
     expired_subs = Subscription.objects.filter(end_date__lt=today, status=True)
     count = expired_subs.update(status=False)
     print(f"✅ Updated {count} expired subscriptions to inactive.")
+
+@receiver(user_logged_in)
+def log_login(sender, request, user, **kwargs):
+    logger.info(f"User {user.username} logged in.")
+
+@receiver(user_logged_out)
+def log_logout(sender, request, user, **kwargs):
+    logger.info(f"User {user.username} logged out.")

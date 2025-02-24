@@ -23,8 +23,8 @@
                 <tr>
                   <th>Ngày</th>
                   <th>Text</th>
-                  <th>Tải file text</th>
-                  <th>Voice</th>
+                  <th>Số ký tự</th>
+                  <th>Thời lượng (s)</th>
                   <th>Gói</th>
                 </tr>
               </thead>
@@ -32,23 +32,15 @@
                 {% for history in use_history %}
                 <tr>
                   <td>{{ history.timestamp }}</td>
-                  <td>{{ history.input_text }}</td> <!-- Tên gói từ bảng Package -->
-                  <td>
-                    <a href="{% static 'history/input_text/' %}{{ history.text_file }}" download>
-                      Tải file text đầy đủ
-                    </a>  
-                  </td> <!-- Giá trị giao dịch -->
-                  <td>
-                    <a href="{% static 'history/output_audio/' %}{{ history.voice_file }}" download>
-                      Tải file audio
-                    </a>  
-                  </td> <!-- Giá trị giao dịch -->
-                  <td>{{ history.package.name }} </td> <!-- Giá trị giao dịch -->
+                  <td>{{ history.text_preview }}</td> <!-- 10 từ đầu tiên -->
+                  <td>{{ history.character_count }}</td> <!-- Số ký tự -->
+                  <td>{{ history.duration|default:"N/A" }}</td> <!-- Thời lượng audio -->
+                  <td>{{ history.package.name|default:"N/A" }} </td> <!-- Tên gói -->
 
                 </tr>
                 {% empty %}
                 <tr>
-                  <td colspan="3">Chưa có lịch sử sử dụng.</td>
+                  <td colspan="5" class="text-center">Chưa có lịch sử sử dụng.</td>
                 </tr>
                 {% endfor %}
               </tbody>

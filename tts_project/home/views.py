@@ -11,26 +11,32 @@ from django.contrib.auth import logout
 from django.db.models import Q
 import os
 import shutil
-import random
-import string
+import datetime
 from django.conf import settings
 from django.urls import reverse
-import zipfile
+from mutagen.mp3 import MP3
 
 # model
 from gtts import gTTS
+from django.http import HttpResponse
 
 # forgot password
 from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView
 
-############
 # Chỉ thay đổi 1 phần html, không load lại cả trang
 from django.http import JsonResponse
+import logging
+
+logger = logging.getLogger('django')
+
+def my_view(request):
+    logger.info(f"User {request.user.username} accessed my_view")
+    return HttpResponse("Hello, logging!")
 
 
 def get_index(request):
     if not request.user.is_authenticated:
-        return redirect('login')  
+        return redirect('login')
 
     customer = Customer.objects.get(username=request.user.username)
     active_subscription = Subscription.objects.filter(customer=customer, status=True).first()
@@ -50,17 +56,18 @@ def get_index(request):
         elif active_package_name == 'Pro Package':
             char_limit = None  
 
-    username = request.user.name
-    money = request.user.money
+    username = customer.name
+    money = customer.money
     
     # Xóa file cũ nếu tồn tại trong session
-    loc = request.session.get('loc')
+    loc = request.session.get('loc', None)
     if loc:
-        old_file_path = os.path.join(settings.BASE_DIR, "static/sound", loc)
+        old_file_path = os.path.join(settings.MEDIA_ROOT, "sound", loc)
         if os.path.exists(old_file_path):
             os.remove(old_file_path)  # Xóa file cũ
-        del request.session['loc']  # Xóa khỏi session
-        
+        request.session.pop('loc', None)  # Xóa loc trong session
+        request.session.modified = True  # Cập nhật session
+  
     return render(request, 'index.html', {
         'username': username, 
         'customer_value': money, 
@@ -68,22 +75,23 @@ def get_index(request):
         'char_limit': char_limit, 
         'loc': loc
     })
-    # return render(request, "test.html")
 
 def submit_input(request):
     customer = Customer.objects.get(username=request.user.username)
     active_subscription = Subscription.objects.filter(customer=customer, status=True).first()
 
     if request.method == "POST" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
-        # Xóa file cũ nếu có
-        old_loc = request.session.get('loc')
+        # Xóa file cũ nếu tồn tại trong session
+        old_loc = request.session.pop('loc', None)
         if old_loc:
-            old_file_path = os.path.join(settings.BASE_DIR, "static/sound", old_loc)
+            old_file_path = os.path.join(settings.MEDIA_ROOT, "sound", old_loc)
             if os.path.exists(old_file_path):
                 os.remove(old_file_path)  # Xóa file cũ
-            del request.session['loc']  # Xóa khỏi session
-        letters = string.ascii_lowercase
-        file_name = f"{''.join(random.choice(letters) for i in range(10))}.mp3"
+            request.session.modified = True  # Cập nhật session
+
+        username = customer.username
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        file_name = f"{username}_{timestamp}.mp3"
 
         text = request.POST['text']
         tdl = request.POST['tdl']
@@ -92,47 +100,31 @@ def submit_input(request):
         tts = gTTS(text, lang=lang, tld=tdl)
         tts.save(file_name)
 
-        # Đường dẫn thư mục
-        base_dir = os.getcwd()
-        sound_dir = os.path.join(base_dir, "static/sound/")
-        input_dir = os.path.join(base_dir, "static/history/input_text/")
-        output_dir = os.path.join(base_dir, "static/history/output_audio/")
-
         # Đảm bảo thư mục tồn tại
+        sound_dir = os.path.join(settings.MEDIA_ROOT, "sound")
         os.makedirs(sound_dir, exist_ok=True)
-        os.makedirs(output_dir, exist_ok=True)
 
-        # Di chuyển file MP3 vào static/sound/
+        # Di chuyển file MP3 vào thư mục
         mp3_path = shutil.move(file_name, sound_dir)
+        audio = MP3(mp3_path)
+        duration = round(audio.info.length, 2)
 
-        # Tạo file ZIP
-        zip_name = f"{os.path.splitext(file_name)[0]}.zip"
-        zip_path = os.path.join(output_dir, zip_name)
-
-        with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
-            zipf.write(mp3_path, os.path.basename(mp3_path))
-            
-        # Lưu file ZIP chứa input_text.txt
-        text_zip_path = os.path.join(input_dir, zip_name)
-        with zipfile.ZipFile(text_zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
-            zipf.writestr("input_text.txt", text)
-
-        # Lưu tên file vào session
-        request.session['loc'] = file_name
-        loc = file_name
-        
-        # Lưu vào History
+        # Lưu vào History (chỉ lưu thông tin quan trọng)
         History.objects.create(
             customer=customer,
             timestamp=now(),
-            input_text=" ".join(text.split()[:10]) + "...",  # 10 từ đầu tiên
-            text_file=zip_name, # static\history\input_text
-            voice_file=zip_name, # static\history\output_audio
-            package=active_subscription.package
+            text_preview=" ".join(text.split()[:10]) + ("..." if len(text.split()) > 10 else ""),
+            character_count=len(text),
+            duration=duration,  # Nếu gTTS hỗ trợ
+            package=active_subscription.package if active_subscription else None,
+            cost=None  # Nếu cần tính phí, có thể thêm công thức
         )
-        return JsonResponse({"success": True, "loc": file_name}) # Trả về danh sách dữ liệu đã nộp
 
-############
+        # Lưu lại đường dẫn của file mới trong session
+        request.session['loc'] = file_name  
+        request.session.modified = True  # Cập nhật session
+
+        return JsonResponse({"success": True, "loc": file_name, "media_url": settings.MEDIA_URL})
 
 
 
@@ -235,7 +227,6 @@ def get_history_use(request): # lịch sử dùng
     username = request.user.name
     money = request.user.money
     use_history = History.objects.filter(customer=request.user).order_by('-timestamp')  # Giả sử có trường `date`
-    
     return render(request, 'history_use.html', {'username':username, 'customer_value': money, 'use_history': use_history})
 
 def get_history_buy(request): # lịch sử mua

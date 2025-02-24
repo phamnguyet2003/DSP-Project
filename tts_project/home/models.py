@@ -55,20 +55,28 @@ class Payment(models.Model):
 class History(models.Model):
     customer = models.ForeignKey('Customer', on_delete=models.CASCADE, related_name="histories")
     timestamp = models.DateTimeField(default=now)  # Ghi lại thời gian chi tiết hơn
-    input_text = models.TextField()  # Lưu text đầu vào 10 chữ đầu tiên
-    text_file = models.FileField(blank=True, null=True)  # Lưu file audio
-    voice_file = models.FileField(upload_to="tts_outputs/", blank=True, null=True)  # Lưu file audio
-    package = models.ForeignKey('Package', on_delete=models.SET_NULL, null=True, blank=True)  # Tham chiếu đến bảng Package
+    text_preview = models.CharField(max_length=255, blank=True)  # Lưu 10 từ đầu tiên của input_text
+    character_count = models.PositiveIntegerField(default=0)  # Số ký tự đã sử dụng
+    duration = models.FloatField(blank=True, null=True)  # Thời lượng file audio (giây)
+    package = models.ForeignKey('Package', on_delete=models.SET_NULL, null=True, blank=True)  # Gói dịch vụ
+    cost = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)  # Chi phí nếu có
 
     class Meta:
         ordering = ['-timestamp']  # Sắp xếp mới nhất lên đầu
         indexes = [
             models.Index(fields=['timestamp']),
             models.Index(fields=['customer']),
+            models.Index(fields=['package']),
         ]
 
+    def save(self, *args, **kwargs):
+        """Tự động lấy 10 từ đầu tiên của input_text (nếu có)"""
+        if not self.text_preview and hasattr(self, 'input_text'):
+            self.text_preview = ' '.join(self.input_text.split()[:10]) + ('...' if len(self.input_text.split()) > 10 else '')
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"History for {self.customer.name} on {self.timestamp.strftime('%Y-%m-%d %H:%M:%S')}"
+        return f"{self.customer.name} | {self.timestamp.strftime('%Y-%m-%d %H:%M:%S')} | {self.character_count} chars"
 
 
 # Wallet model: Lưu tiền khách chuyển vào ngân hàng
