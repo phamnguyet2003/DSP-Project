@@ -24,8 +24,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),  
     path("", views.get_home, name='home'),
     
-    # path("test/", views.test, name='test'),
-    path("submit-input/", views.submit_input, name='submit_input'),  # Xử lý AJAX for
+    path("get_private_audio/", views.get_private_audio, name='get_private_audio'),  # Xử lý AJAX for
     
     path("index/", views.get_index, name='index'),
     path("instruction/", views.get_instruction, name='instruction'),
@@ -44,6 +43,3 @@ urlpatterns = [
     path('password-reset-confirm/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='password_reset/password_reset_confirm.html'), name='password_reset_confirm'),
     path('password-reset-complete/', auth_views.PasswordResetCompleteView.as_view(template_name='password_reset/password_reset_complete.html'), name='password_reset_complete'),
 ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

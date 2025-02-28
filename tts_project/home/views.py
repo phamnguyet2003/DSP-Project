@@ -1,3 +1,4 @@
+import io
 from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model, authenticate, login as auth_login
 from django.contrib.auth.decorators import login_required
@@ -15,10 +16,9 @@ import datetime
 from django.conf import settings
 from django.urls import reverse
 from mutagen.mp3 import MP3
-
 # model
 from gtts import gTTS
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse
 
 # forgot password
 from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView
@@ -67,67 +67,60 @@ def get_index(request):
             os.remove(old_file_path)  # Xóa file cũ
         request.session.pop('loc', None)  # Xóa loc trong session
         request.session.modified = True  # Cập nhật session
-  
+    # media_url = settings.MEDIA_URL
+    # print(media_url)
     return render(request, 'index.html', {
         'username': username, 
         'customer_value': money, 
         'package': {'name': active_package_name, 'start': active_package_start_date, 'end': active_package_end_date}, 
         'char_limit': char_limit, 
-        'loc': loc
+        'loc': loc,
+        # 'media_url': media_url
     })
 
-def submit_input(request):
+def get_private_audio(request):
     customer = Customer.objects.get(username=request.user.username)
     active_subscription = Subscription.objects.filter(customer=customer, status=True).first()
 
-    if request.method == "POST" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
-        # Xóa file cũ nếu tồn tại trong session
-        old_loc = request.session.pop('loc', None)
-        if old_loc:
-            old_file_path = os.path.join(settings.MEDIA_ROOT, "sound", old_loc)
-            if os.path.exists(old_file_path):
-                os.remove(old_file_path)  # Xóa file cũ
-            request.session.modified = True  # Cập nhật session
-
-        username = customer.username
+    if request.method == "GET":
+        
+        username = request.user.username
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         file_name = f"{username}_{timestamp}.mp3"
 
-        text = request.POST['text']
-        tdl = request.POST['tdl']
-        lang = request.POST['lang']
+        text = request.GET['text']
+        tdl = request.GET['tdl']
+        lang = request.GET['lang']
+        isDownload = request.GET.get('isDownload', "false")
 
         tts = gTTS(text, lang=lang, tld=tdl)
-        tts.save(file_name)
+        my_buffer = io.BytesIO()
+        tts.write_to_fp(my_buffer)
+        my_buffer.seek(0)
+        audio = MP3(my_buffer)
+        if isDownload == "false":
+            duration = round(audio.info.length, 2)
+            print(duration)
 
-        # Đảm bảo thư mục tồn tại
-        sound_dir = os.path.join(settings.MEDIA_ROOT, "sound")
-        os.makedirs(sound_dir, exist_ok=True)
-
-        # Di chuyển file MP3 vào thư mục
-        mp3_path = shutil.move(file_name, sound_dir)
-        audio = MP3(mp3_path)
-        duration = round(audio.info.length, 2)
-
-        # Lưu vào History (chỉ lưu thông tin quan trọng)
-        History.objects.create(
-            customer=customer,
-            timestamp=now(),
-            text_preview=" ".join(text.split()[:10]) + ("..." if len(text.split()) > 10 else ""),
-            character_count=len(text),
-            duration=duration,  # Nếu gTTS hỗ trợ
-            package=active_subscription.package if active_subscription else None,
-            cost=None  # Nếu cần tính phí, có thể thêm công thức
-        )
+            # # Lưu vào History (chỉ lưu thông tin quan trọng)
+            History.objects.create(
+                customer=request.user,
+                timestamp=now(),
+                text_preview=" ".join(text.split()[:10]) + ("..." if len(text.split()) > 10 else ""),
+                character_count=len(text),
+                duration=duration,  # Nếu gTTS hỗ trợ
+                package=active_subscription.package if active_subscription else None,
+                cost=None  # Nếu cần tính phí, có thể thêm công thức
+            )
 
         # Lưu lại đường dẫn của file mới trong session
         request.session['loc'] = file_name  
         request.session.modified = True  # Cập nhật session
-
-        return JsonResponse({"success": True, "loc": file_name, "media_url": settings.MEDIA_URL})
-
-
-
+        my_buffer.seek(0)
+        response = HttpResponse(my_buffer.read(), content_type="audio/mpeg")
+        response['Content-Disposition']=f'attachment; filename={file_name}'
+        return response
+    
 
 # Create your views here.
 class CustomPasswordResetView(PasswordResetView):

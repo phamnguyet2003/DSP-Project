@@ -83,18 +83,15 @@
       <div class="col-md-5">
         <h3 class="text-center mb-4">Output</h3>
         <div id="output-section">
-          {% if loc %}
+          {% comment %} {% if loc %} {% endcomment %}
             <div class="alert alert-success" role="alert">
                 Your File is Ready to 
-                <a id="download-link" href="{{ media_url }}/sound/{{ loc }}" download>Download</a>
+                <a id="download-link" download>Download</a>
             </div>
-            <div class="text-center">
-              <audio id="audio-player" controls style="width: 100%;">
-                <source id="audio-source" src="{{ media_url }}/sound/{{ loc }}" type="audio/mp3">
-                Your browser does not support the audio element.
-              </audio>
+            <div class="text-center" id="audio-player-id">
+              
             </div>
-          {% endif %}
+          {% comment %} {% endif %} {% endcomment %}
         </div>
       </div>
 
@@ -104,56 +101,29 @@
 </main>
 <script>
   document.addEventListener("DOMContentLoaded", function() {
+
+    const langElement = document.querySelector("#language")
+    const textElement = document.querySelector("#text_area")
+    const countryElement = document.querySelector("#country")
     const form = document.getElementById("ttsForm");
-    const outputSection = document.getElementById("output-section");
-    const textarea = document.getElementById("text_area");
-    const charCount = document.getElementById("char_count");
-    const charLimit = {{ char_limit|default:"null" }};  // Nhận giá trị từ Django
-
-    // Cập nhật số ký tự nhập vào
-    textarea.addEventListener("input", function() {
-        charCount.textContent = textarea.value.length;
-    });
-
-    // Nếu không giới hạn ký tự, xóa thuộc tính maxlength
-    if (charLimit === null) {
-        textarea.removeAttribute("maxlength");
-    }
-
-    // Xử lý gửi form bằng AJAX
     form.addEventListener("submit", function(event) {
-        event.preventDefault(); // Ngăn form reload trang
+    
+      event.preventDefault();
+      document.querySelector("#download-link").href=`/get_private_audio?lang=${langElement.value}&text=${textElement.value}&tdl=${countryElement.value}&isDownload=true`
+const audioSrc = document.createElement("source");
+const audio = document.querySelector("#audio-player-id");
+audio.innerHTML = `
+<audio id="audio-player" controls style="width: 100%;">
+                <source src=${`/get_private_audio?lang=${langElement.value}&text=${textElement.value.replaceAll(" ","%20")}&tdl=${countryElement.value}&isDownload=false`} id="audio-source" type="audio/mp3">
+                Your browser does not support the audio element. 
+              </audio>
+`
 
-        const formData = new FormData(form);
-        
-        fetch("{% url 'submit_input' %}", {
-            method: "POST",
-            body: formData,
-            headers: {
-                "X-Requested-With": "XMLHttpRequest"
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                outputSection.innerHTML = `
-                  <div class="alert alert-success" role="alert">
-                      Your File is Ready to 
-                      <a id="download-link" href="/media/sound/${data.loc}" download>Download</a>
-                  </div>
-                  <div class="text-center">
-                      <audio id="audio-player" controls style="width: 100%;">
-                          <source id="audio-source" src="/media/sound/${data.loc}" type="audio/mp3">
-                          Your browser does not support the audio element.
-                      </audio>
-                  </div>
-                `;
-            } else {
-                outputSection.innerHTML = `<div class="alert alert-danger">Error generating audio!</div>`;
-            }
-        })
-        .catch(error => console.error("Error:", error));
-    });
+
+    })
+
+
+
 });
 </script>
 {% endblock %}
