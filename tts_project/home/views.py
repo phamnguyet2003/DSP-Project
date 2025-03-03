@@ -33,7 +33,6 @@ def my_view(request):
     logger.info(f"User {request.user.username} accessed my_view")
     return HttpResponse("Hello, logging!")
 
-
 def get_index(request):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -100,7 +99,6 @@ def get_private_audio(request):
         audio = MP3(my_buffer)
         if isDownload == "false":
             duration = round(audio.info.length, 2)
-            print(duration)
 
             # # Lưu vào History (chỉ lưu thông tin quan trọng)
             History.objects.create(
@@ -148,18 +146,30 @@ class CustomPasswordResetDoneView(PasswordResetDoneView):
         context = super().get_context_data(**kwargs)
         context['masked_email'] = self.request.session.get('masked_email', '')
         return context
-    
+ 
+def track_page_view():
+    today = now().date()
+    page_view, created = PageView.objects.get_or_create(date=today)
+    page_view.count += 1
+    page_view.save()
+       
 def get_home(request):
     
     if not request.user.is_authenticated:
         customers_count = Customer.objects.count()
         return render(request, 'home_not_log_in.html', { "customers_count": customers_count})  # Hoặc trang đăng nhập của bạn
     
+    track_page_view()
+    
+    today = now().date()
+    page_view = PageView.objects.filter(date=today).first()
+    visit_count = page_view.count if page_view else 0
+    
     customers_count = Customer.objects.count()
     username = request.user.name
     money = request.user.money
 
-    return render(request, 'home.html', {'username':username, 'customer_value': money, "customers_count": customers_count})
+    return render(request, 'home.html', {'username':username, 'customer_value': money, "customers_count": customers_count, 'visit_count': visit_count})
 
 def get_payments(request): # mua gói cước
     if not request.user.is_authenticated:

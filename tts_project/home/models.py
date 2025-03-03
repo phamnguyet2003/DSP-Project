@@ -94,3 +94,9 @@ class Wallet(models.Model):
 
     def __str__(self):
         return f"Wallet for {self.customer.username}"
+
+class PageView(models.Model):
+    date = models.DateField(default=now, unique=True)
+    count = models.IntegerField(default=0)
+    def __str__(self):
+        return f"{self.date}"

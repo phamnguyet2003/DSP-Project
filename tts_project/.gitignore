@@ -1,0 +1,4 @@
+*.pyc
+__pycache__/
+static/Sound/
+static/history/
