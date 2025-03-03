@@ -64,7 +64,7 @@
               <label for="text_area" class="form-label fw-bold">Enter Text</label>
               <textarea class="form-control" id="text_area" rows="6" name="text" required 
                         placeholder="Write something here..."
-                        {% if char_limit %} maxlength="{{ char_limit }}" {% endif %}></textarea>
+                        {% if char_limit %} maxlength="{{ char_limit }}" {% endif %}> Nay trời mưa, tôi không thể đi chơi. Tôi rất buồn!</textarea>
               <div class="text-muted mt-1">
                   <span id="char_count">0</span>/ 
                   <span id="char_limit_display">
@@ -110,20 +110,35 @@
     
       event.preventDefault();
       document.querySelector("#download-link").href=`/get_private_audio?lang=${langElement.value}&text=${textElement.value}&tdl=${countryElement.value}&isDownload=true`
-const audioSrc = document.createElement("source");
-const audio = document.querySelector("#audio-player-id");
-audio.innerHTML = `
-<audio id="audio-player" controls style="width: 100%;">
-                <source src=${`/get_private_audio?lang=${langElement.value}&text=${textElement.value.replaceAll(" ","%20")}&tdl=${countryElement.value}&isDownload=false`} id="audio-source" type="audio/mp3">
-                Your browser does not support the audio element. 
-              </audio>
-`
-
-
+      const audioSrc = document.createElement("source");
+      const audio = document.querySelector("#audio-player-id");
+      audio.innerHTML = `
+      <audio id="audio-player" controls style="width: 100%;">
+                      <source src=${`/get_private_audio?lang=${langElement.value}&text=${textElement.value.replaceAll(" ","%20")}&tdl=${countryElement.value}&isDownload=false`} id="audio-source" type="audio/mp3">
+                      Your browser does not support the audio element. 
+                    </audio>
+      `
     })
+    const charCount = document.getElementById("char_count");
+    const charLimitDisplay = document.getElementById("char_limit_display");
+    function updateCharCount() {
+          let textLength = textElement.value.length;
+          charCount.textContent = textLength;
+          
+          // Nếu có giới hạn ký tự, kiểm tra và hiển thị cảnh báo
+          if (textLength >= charLimit) {
+              charCount.style.color = "red"; // Đổi màu đỏ khi vượt giới hạn
+          } else {
+              charCount.style.color = "black";
+          }
+      }
 
+      // Lắng nghe sự kiện nhập liệu
+      textElement.addEventListener("input", updateCharCount);
 
-
+      // Gọi ngay khi trang tải để cập nhật số ký tự ban đầu
+      updateCharCount();
 });
+
 </script>
 {% endblock %}
