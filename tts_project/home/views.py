@@ -156,8 +156,11 @@ def track_page_view():
 def get_home(request):
     
     if not request.user.is_authenticated:
+        today = now().date()
+        page_view = PageView.objects.filter(date=today).first()
+        visit_count = page_view.count if page_view else 0
         customers_count = Customer.objects.count()
-        return render(request, 'home_not_log_in.html', { "customers_count": customers_count})  # Hoặc trang đăng nhập của bạn
+        return render(request, 'home_not_log_in.html', { "customers_count": customers_count, "visit_count":visit_count})  # Hoặc trang đăng nhập của bạn
     
     track_page_view()
     
