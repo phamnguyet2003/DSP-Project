@@ -2,6 +2,8 @@
 
 ## Giới thiệu
 Đây là một ứng dụng Django sử dụng Text-to-Speech (TTS) để chuyển đổi văn bản thành giọng nói.
+[Truy cập Website](https://chameleonvoice-d36f6e4c646b.herokuapp.com/)
+
 
 ## Cài đặt và chạy dự án
 
