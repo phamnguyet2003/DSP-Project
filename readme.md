@@ -5,6 +5,13 @@
 
 ## Cài đặt và chạy dự án
 
+```sh
+Nếu bạn muốn dùng chạy local, nhớ thiết lập biến môi trường:
+- SECRET_KEY: Secret key của Django 
+- EMAIL_PASS, EMAIL_USER: Mật khẩu và gmail của mail doanh nghiệp (phục vụ gửi mail đặt lại mật khẩu) 
+- PASSWORD_DB_PostgreSQL: Password connect vào db (sửa phần config DATABASES trong settings)
+```
+
 ### 1. Kích hoạt môi trường ảo
 ```sh
 myenv\Scripts\activate
