@@ -1,6 +1,6 @@
 from gradio_client import Client
 
-client = Client("https://b006eb750310adcccf.gradio.live/")
+client = Client("https://561b9e7602b44cd7b6.gradio.live/")
 result = client.predict(
 		prompt="Xin chào, tôi là một mô hình chuyển đổi văn bản thành giọng nói tiếng Việt.",
 		language="vi",
