@@ -30,20 +30,27 @@
             {% csrf_token %}
             
             <div class="mb-3">
-                <label for="language" class="form-label fw-bold">Language</label>
+                <label for="language" class="form-label fw-bold">Ngôn ngữ</label>
                 <select id="language" class="form-select" name="lang">
+                    <option value="vi">Vietnamese</option>
                     <option value="en">English</option>
-                    <option value="hi">Hindi</option>
-                    <option value="fr">French</option>
-                    <option value="zh-TW">Mandarin (Taiwan)</option>
-                    <option value="zh-CN">Mandarin (China Mainland)</option>
-                    <option value="pt">Portuguese</option>
                     <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                    <option value="de">German</option>
+                    <option value="it">Italian</option>
+                    <option value="pt">Portuguese</option>
+                    <option value="pl">Polish</option>
+                    <option value="tr">Turkish</option>
+                    <option value="ru">Russian</option>
+                    <option value="nl">Dutch</option>
+                    <option value="cs">Czech</option>
+                    <option value="ar">Arabic</option>
+                    <option value="hu">Hungarian</option>                  
                 </select>
             </div>
 
             <div class="mb-3">
-                <label for="country" class="form-label fw-bold">Country</label>
+                <label for="country" class="form-label fw-bold">Đất nước</label>
                 <select id="country" class="form-select" name="tdl">
                     <option value="com.au">Australia</option>
                     <option value="co.uk">United Kingdom</option>
@@ -60,8 +67,24 @@
                 </select>
             </div>
  
+
             <div class="mb-3">
-              <label for="text_area" class="form-label fw-bold">Enter Text</label>
+                <label for="sample" class="form-label fw-bold">Giọng mẫu</label>
+                <select id="sample" class="form-select" name="spl">
+                  <option value="/content/model/samples/nam-calm.wav">Giọng nam</option>
+                  <option value="/content/model/samples/nam-cham.wav">Giọng nam chậm</option>
+                  <option value="/content/model/samples/nam-nhanh.wav">Giọng nam nhanh</option>
+                  <option value="/content/model/samples/nam-truyen-cam.wav">Giọng nam truyền cảm</option>
+                  <option value="/content/model/samples/nu-calm.wav">Giọng nữ</option>
+                  <option value="/content/model/samples/nu-cham.wav">Giọng nữ chậm</option>
+                  <option value="/content/model/samples/nu-luu-loat.wav">Giọng nữ lưu loát</option>
+                  <option value="/content/model/samples/nu-nhan-nha.wav">Giọng nữ nhấn nhá</option>
+                  <option value="/content/model/samples/nu-nhe-nhang.wav">Giọng nữ nhẹ nhàng</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="text_area" class="form-label fw-bold">Nhập văn bản</label>
               <textarea class="form-control" id="text_area" rows="6" name="text" required 
                         placeholder="Write something here..."
                         {% if char_limit %} maxlength="{{ char_limit }}" {% endif %}> Nay trời mưa, tôi không thể đi chơi. Tôi rất buồn!</textarea>
@@ -85,12 +108,16 @@
         <div id="output-section">
           {% comment %} {% if loc %} {% endcomment %}
             <div class="alert alert-success" role="alert">
-                Your File is Ready to 
-                <a id="download-link" download>Download</a>
+                File âm thanh của bạn đã sẵn sàng để
+                <a id="download-link" download>tải xuống</a>
             </div>
             <div class="text-center" id="audio-player-id">
-              
             </div>
+
+            <div id="loading" style="display: none; text-align: center;">
+                <p>⏳ Đang tạo giọng nói, vui lòng chờ...</p>
+            </div>
+          
           {% comment %} {% endif %} {% endcomment %}
         </div>
       </div>
@@ -105,19 +132,25 @@
     const langElement = document.querySelector("#language")
     const textElement = document.querySelector("#text_area")
     const countryElement = document.querySelector("#country")
+    const sampleElement = document.querySelector("#sample")
     const form = document.getElementById("ttsForm");
-    form.addEventListener("submit", function(event) {
     
+    form.addEventListener("submit", function(event) {
       event.preventDefault();
-      document.querySelector("#download-link").href=`/get_private_audio?lang=${langElement.value}&text=${textElement.value}&tdl=${countryElement.value}&isDownload=true`
+      document.getElementById("loading").style.display = "block";
+      document.querySelector("#download-link").href=`/get_private_audio?lang=${langElement.value}&text=${textElement.value}&tdl=${countryElement.value}&spl=${sampleElement.value}&isDownload=true`
       const audioSrc = document.createElement("source");
       const audio = document.querySelector("#audio-player-id");
       audio.innerHTML = `
       <audio id="audio-player" controls style="width: 100%;">
-                      <source src=${`/get_private_audio?lang=${langElement.value}&text=${textElement.value.replaceAll(" ","%20")}&tdl=${countryElement.value}&isDownload=false`} id="audio-source" type="audio/mp3">
+                      <source src=${`/get_private_audio?lang=${langElement.value}&text=${textElement.value.replaceAll(" ","%20")}&tdl=${countryElement.value}&spl=${sampleElement.value}&isDownload=false`} id="audio-source" type="audio/mp3">
                       Your browser does not support the audio element. 
                     </audio>
       `
+      const audioPlayer = document.querySelector("#audio-player");
+      audioPlayer.oncanplaythrough = function () {
+          document.getElementById("loading").style.display = "none";
+      };
     })
     const charCount = document.getElementById("char_count");
     const charLimitDisplay = document.getElementById("char_limit_display");
