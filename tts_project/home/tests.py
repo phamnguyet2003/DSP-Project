@@ -1,12 +1,12 @@
-import os
-import django
-from django.conf import settings
+from gradio_client import Client
 
-# Đặt biến môi trường để Django biết nơi tìm settings.py
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "tts_project.settings")
-
-# Khởi tạo Django
-django.setup()
-
-# Kiểm tra BASE_DIR
-print("BASE_DIR:", settings.MEDIA_ROOT)
+client = Client("https://561b9e7602b44cd7b6.gradio.live/")
+result = client.predict(
+		prompt="Xin chào, tôi là một mô hình chuyển đổi văn bản thành giọng nói tiếng Việt.",
+		language="vi",
+		audio_file_pth="/content/model/samples/nu-luu-loat.wav", # tạo list
+		normalize_text=True,
+		target_language=None,   # đoạn này trong html thì tạo check list các support language cho user
+		api_name="/predict"
+)
+print(result)

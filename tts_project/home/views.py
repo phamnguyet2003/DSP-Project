@@ -11,24 +11,24 @@ from django.core.cache import cache
 from django.contrib.auth import logout
 from django.db.models import Q
 import os
-import shutil
+# import shutil
 import datetime
 from django.conf import settings
 from django.urls import reverse
 from mutagen.mp3 import MP3
 # model
 from gtts import gTTS
-from django.http import HttpResponse, FileResponse
+from django.http import HttpResponse#, FileResponse
 
 # forgot password
 from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView
+from gradio_client import Client
+
 
 # Chỉ thay đổi 1 phần html, không load lại cả trang
-from django.http import JsonResponse
+# from django.http import JsonResponse
 import logging
-
 logger = logging.getLogger('django')
-
 def my_view(request):
     logger.info(f"User {request.user.username} accessed my_view")
     return HttpResponse("Hello, logging!")
@@ -77,47 +77,122 @@ def get_index(request):
         # 'media_url': media_url
     })
 
+# def get_private_audio(request):
+#     customer = Customer.objects.get(username=request.user.username)
+#     active_subscription = Subscription.objects.filter(customer=customer, status=True).first()
+
+#     if request.method == "GET":
+        
+#         username = request.user.username
+#         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+#         file_name = f"{username}_{timestamp}.mp3"
+
+#         text = request.GET['text']
+#         tdl = request.GET['tdl']
+#         lang = request.GET['lang']
+#         isDownload = request.GET.get('isDownload', "false")
+
+#         tts = gTTS(text, lang=lang, tld=tdl)
+        
+#         my_buffer = io.BytesIO()
+#         tts.write_to_fp(my_buffer)
+#         my_buffer.seek(0)
+#         audio = MP3(my_buffer)
+#         if isDownload == "false":
+#             duration = round(audio.info.length, 2)
+
+#             # # Lưu vào History (chỉ lưu thông tin quan trọng)
+#             History.objects.create(
+#                 customer=request.user,
+#                 timestamp=now(),
+#                 text_preview=" ".join(text.split()[:10]) + ("..." if len(text.split()) > 10 else ""),
+#                 character_count=len(text),
+#                 duration=duration,  # Nếu gTTS hỗ trợ
+#                 package=active_subscription.package if active_subscription else None,
+#                 cost=None  # Nếu cần tính phí, có thể thêm công thức
+#             )
+
+#         # Lưu lại đường dẫn của file mới trong session
+#         request.session['loc'] = file_name  
+#         request.session.modified = True  # Cập nhật session
+#         my_buffer.seek(0)
+#         response = HttpResponse(my_buffer.read(), content_type="audio/mpeg")
+#         response['Content-Disposition']=f'attachment; filename={file_name}'
+#         return response
+import io
+import datetime
+from django.http import HttpResponse
+from django.utils.timezone import now
+from mutagen.mp3 import MP3
+from gradio_client import Client
+from .models import Customer, Subscription, History  # Import các model cần thiết
+
 def get_private_audio(request):
     customer = Customer.objects.get(username=request.user.username)
     active_subscription = Subscription.objects.filter(customer=customer, status=True).first()
 
     if request.method == "GET":
-        
+        # Lấy thông tin request
         username = request.user.username
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         file_name = f"{username}_{timestamp}.mp3"
 
-        text = request.GET['text']
-        tdl = request.GET['tdl']
-        lang = request.GET['lang']
+        text = request.GET.get('text', '')
+        tdl = request.GET.get('tdl', 'None')
+        lang = request.GET.get('lang', 'vi')
+        spl = request.GET.get('spl', '/content/model/samples/nu-luu-loat.wav')
         isDownload = request.GET.get('isDownload', "false")
 
-        tts = gTTS(text, lang=lang, tld=tdl)
-        my_buffer = io.BytesIO()
-        tts.write_to_fp(my_buffer)
-        my_buffer.seek(0)
-        audio = MP3(my_buffer)
-        if isDownload == "false":
-            duration = round(audio.info.length, 2)
+        # Gọi API của Gradio để tạo âm thanh
+        client = Client("https://ba77c12450ab7c6667.gradio.live/")
+        result = client.predict(
+            prompt=text,
+            language=lang,
+            audio_file_pth=spl,  # Chọn giọng mẫu
+            normalize_text=True,
+            target_language=tdl if tdl != "None" else None,
+            api_name="/predict"
+        )
 
-            # # Lưu vào History (chỉ lưu thông tin quan trọng)
+        audio_path = result[0]  # API trả về đường dẫn file âm thanh từ Gradio
+
+        # Đọc file âm thanh từ Gradio
+        try:
+            with open(audio_path, "rb") as f:
+                audio_data = f.read()
+        except Exception as e:
+            return HttpResponse(f"Lỗi khi đọc file âm thanh: {str(e)}", status=500)
+
+        # Tính thời lượng file
+        my_buffer = io.BytesIO(audio_data)
+        my_buffer.seek(0)
+        try:
+            audio = MP3(my_buffer)
+            duration = round(audio.info.length, 2)
+        except Exception:
+            duration = None
+
+        # Lưu lịch sử nếu không phải chế độ tải xuống
+        if isDownload == "false":
             History.objects.create(
                 customer=request.user,
                 timestamp=now(),
                 text_preview=" ".join(text.split()[:10]) + ("..." if len(text.split()) > 10 else ""),
                 character_count=len(text),
-                duration=duration,  # Nếu gTTS hỗ trợ
+                duration=duration,
                 package=active_subscription.package if active_subscription else None,
-                cost=None  # Nếu cần tính phí, có thể thêm công thức
+                cost=None
             )
 
         # Lưu lại đường dẫn của file mới trong session
         request.session['loc'] = file_name  
-        request.session.modified = True  # Cập nhật session
-        my_buffer.seek(0)
-        response = HttpResponse(my_buffer.read(), content_type="audio/mpeg")
-        response['Content-Disposition']=f'attachment; filename={file_name}'
+        request.session.modified = True  
+
+        # Trả file âm thanh về frontend
+        response = HttpResponse(audio_data, content_type="audio/mpeg")
+        response['Content-Disposition'] = f'attachment; filename={file_name}'
         return response
+
     
 
 # Create your views here.
