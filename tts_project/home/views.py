@@ -23,6 +23,7 @@ from django.http import HttpResponse#, FileResponse
 # forgot password
 from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView
 from gradio_client import Client
+from django.utils.timezone import now
 
 
 # Chỉ thay đổi 1 phần html, không load lại cả trang
@@ -77,55 +78,6 @@ def get_index(request):
         # 'media_url': media_url
     })
 
-# def get_private_audio(request):
-#     customer = Customer.objects.get(username=request.user.username)
-#     active_subscription = Subscription.objects.filter(customer=customer, status=True).first()
-
-#     if request.method == "GET":
-        
-#         username = request.user.username
-#         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-#         file_name = f"{username}_{timestamp}.mp3"
-
-#         text = request.GET['text']
-#         tdl = request.GET['tdl']
-#         lang = request.GET['lang']
-#         isDownload = request.GET.get('isDownload', "false")
-
-#         tts = gTTS(text, lang=lang, tld=tdl)
-        
-#         my_buffer = io.BytesIO()
-#         tts.write_to_fp(my_buffer)
-#         my_buffer.seek(0)
-#         audio = MP3(my_buffer)
-#         if isDownload == "false":
-#             duration = round(audio.info.length, 2)
-
-#             # # Lưu vào History (chỉ lưu thông tin quan trọng)
-#             History.objects.create(
-#                 customer=request.user,
-#                 timestamp=now(),
-#                 text_preview=" ".join(text.split()[:10]) + ("..." if len(text.split()) > 10 else ""),
-#                 character_count=len(text),
-#                 duration=duration,  # Nếu gTTS hỗ trợ
-#                 package=active_subscription.package if active_subscription else None,
-#                 cost=None  # Nếu cần tính phí, có thể thêm công thức
-#             )
-
-#         # Lưu lại đường dẫn của file mới trong session
-#         request.session['loc'] = file_name  
-#         request.session.modified = True  # Cập nhật session
-#         my_buffer.seek(0)
-#         response = HttpResponse(my_buffer.read(), content_type="audio/mpeg")
-#         response['Content-Disposition']=f'attachment; filename={file_name}'
-#         return response
-import io
-import datetime
-from django.http import HttpResponse
-from django.utils.timezone import now
-from mutagen.mp3 import MP3
-from gradio_client import Client
-from .models import Customer, Subscription, History  # Import các model cần thiết
 
 def get_private_audio(request):
     customer = Customer.objects.get(username=request.user.username)
