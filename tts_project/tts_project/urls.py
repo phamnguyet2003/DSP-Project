@@ -24,20 +24,31 @@ urlpatterns = [
     path("admin/", admin.site.urls),  
     path("", views.get_home, name='home'),
     
+    # clone giọng
+    path('upload_audio/', views.upload_audio, name='upload_audio'),
+    path('get_audio/', views.get_audio, name='get_audio'),
+    path('display_audio/', views.display_audio, name='display_audio'),
+    path('send_audio/', views.send_audio_to_gradio, name='send_audio'),
+
     path("get_private_audio/", views.get_private_audio, name='get_private_audio'),  # Xử lý AJAX for
-    
     path("index/", views.get_index, name='index'),
+    
     path("instruction/", views.get_instruction, name='instruction'),
+    
     path("money/", views.get_money, name='money'),
     path("payments/", views.get_payments, name='payments'),
+    path('buy_package/', views.buy_package, name='buy_package'),
+    
     path("profile/", views.get_profile, name='profile'),
     path('edit_profile/', views.edit_profile, name='edit_profile'),
+    
     path("history_use/", views.get_history_use, name='history_use'),
     path("history_buy/", views.get_history_buy, name='history_buy'),
+    
     path('login/', views.login, name='login'),
     path('register/', views.register, name='register'),  
-    path('buy_package/', views.buy_package, name='buy_package'),
     path('logout/', views.logout_view, name='logout'),
+
     path('password-reset/', views.CustomPasswordResetView.as_view(template_name='password_reset/password_reset.html'), name='password_reset'),
     path('password-reset/done/', views.CustomPasswordResetDoneView.as_view(template_name='password_reset/password_reset_done.html'), name='password_reset_done'),
     path('password-reset-confirm/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='password_reset/password_reset_confirm.html'), name='password_reset_confirm'),

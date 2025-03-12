@@ -1,44 +1,159 @@
-import io
+import requests
 from django.shortcuts import render, redirect
-from django.contrib.auth import get_user_model, authenticate, login as auth_login
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login as auth_login
+# from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from .forms import RegisterForm, LoginForm, EditProfileForm , CustomPasswordResetForm
 from .models import *
 from datetime import timedelta
-from django.core.cache import cache
+# from django.core.cache import cache
 from django.contrib.auth import logout
 from django.db.models import Q
 import os
-# import shutil
+import re
 import datetime
 from django.conf import settings
-from django.urls import reverse
-from mutagen.mp3 import MP3
-# model
-from gtts import gTTS
-from django.http import HttpResponse#, FileResponse
+from django.http import HttpResponse , JsonResponse, FileResponse
+from django.views.decorators.csrf import csrf_exempt
 
 # forgot password
 from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView
-from gradio_client import Client
 from django.utils.timezone import now
+import io
 
+from .gradio_client_file import client
+from gradio_client import handle_file
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+import tempfile
 
-# Chỉ thay đổi 1 phần html, không load lại cả trang
-# from django.http import JsonResponse
+# Ghi log
 import logging
 logger = logging.getLogger('django')
 def my_view(request):
     logger.info(f"User {request.user.username} accessed my_view")
     return HttpResponse("Hello, logging!")
 
+from django.shortcuts import render
+from django.http import HttpResponse, FileResponse
+
+###########################
+# Voice Clone
+def upload_audio(request):
+    if not request.user.is_authenticated:
+        return redirect('login')  # Hoặc trang đăng nhập của bạn
+    
+    active_subscription = Subscription.objects.filter(customer=request.user, status=True).first()
+    
+    if not active_subscription or active_subscription.package.name != "Pro Package":
+        return redirect('buy_package')  # Hoặc trang đăng nhập của bạn
+        
+    money = request.user.money
+    username = request.user.name
+    
+    
+    if request.method == 'POST':
+        customer = Customer.objects.get(username=request.user.username)
+        name = customer.username
+        audioname = request.POST.get('audioname')
+        uploaded_file = request.FILES.get('file')
+
+        # Kiểm tra nếu tên file đã tồn tại
+        if AudioSample.objects.filter(customer=customer, audioname=audioname).exists():
+            return JsonResponse({"status": "error", "error": "Tên file này đã tồn tại. Vui lòng chọn tên khác."}, status=400)
+
+        try:
+            audio_data = uploaded_file.read()
+
+            # Lưu vào AudioSample
+            audio_sample = AudioSample(
+                customer=customer,
+                audioname=audioname,
+                audio_data=audio_data
+            )
+            audio_sample.save()
+            return redirect('display_audio')
+        except Exception as e:
+            return JsonResponse({"status": "error", "error": f"Lỗi khi lưu file: {str(e)}"}, status=500)
+
+    return render(request, 'upload_audio.html', {'username':username, 'customer_value': money})
+
+def get_audio(request):
+    audioname = request.GET.get('audioname')
+    if not audioname:
+        return HttpResponse("Missing 'audioname' parameter", status=400)
+
+    try:
+        audio_sample = AudioSample.objects.get(audioname=audioname)
+        audio_buffer = io.BytesIO(audio_sample.audio_data)  # Chuyển `memoryview` thành file-like object
+
+        # Trả file về trình duyệt để phát
+        response = FileResponse(audio_buffer, content_type='audio/mpeg')
+        response['Content-Disposition'] = f'inline; filename="{audioname}.mp3"'  # Không tải về mà phát trực tiếp
+        return response
+
+    except AudioSample.DoesNotExist:
+        return HttpResponse("Audio file not found", status=404)
+def display_audio(request):
+    if not request.user.is_authenticated:
+        return redirect('login')  # Hoặc trang đăng nhập của bạn
+    
+    active_subscription = Subscription.objects.filter(customer=request.user, status=True).first()
+    if not active_subscription or active_subscription.package.name != "Pro Package":
+        return redirect('buy_package')  # Hoặc trang đăng nhập của bạn
+        
+    money = request.user.money
+    customer = request.user  # Lấy user hiện tại
+    audio_samples = AudioSample.objects.filter(customer=customer)  # Lấy tất cả audio của user
+    
+    return render(request, 'display_audio.html', {'audio_samples': audio_samples, 'username':customer.name, 'customer_value': money})
+
+def send_audio_to_gradio(request):
+    customer = Customer.objects.get(username=request.user.username)
+    audioname = request.GET.get('audioname')
+    if not audioname:
+        return JsonResponse({"error": "Missing 'audioname' parameter"}, status=400)
+
+    try:
+        # Lấy dữ liệu từ database
+        audio_sample = AudioSample.objects.get(audioname=audioname, customer=request.user)
+
+        # Tạo file tạm thời để lưu dữ liệu
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp_audio:
+            temp_audio.write(audio_sample.audio_data)
+            temp_audio.flush()  # Đảm bảo dữ liệu được ghi hoàn chỉnh
+            temp_audio_path = temp_audio.name  # Lấy đường dẫn file
+
+        # Gọi hàm handle_file() để lấy đường dẫn chính xác
+        processed_file_path = handle_file(temp_audio_path)
+
+        # Gửi file lên Gradio API
+        result = client.predict(
+            audio_path=processed_file_path,  # Đúng định dạng của handle_file()
+            name=f'{customer.username}_{audioname}',
+            api_name="/process_voice_clone"
+        )
+        # Xóa file tạm sau khi sử dụng xong (nếu cần)
+        audio_sample.gradioname = result[len('Voice successfully cloned and saved as: '):]
+        audio_sample.save()
+        os.remove(temp_audio_path)
+        return redirect('display_audio')
+
+    except AudioSample.DoesNotExist:
+        return JsonResponse({"error": "Audio file not found"}, status=404)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+    
+###########################
+
 def get_index(request):
     if not request.user.is_authenticated:
         return redirect('login')
 
     customer = Customer.objects.get(username=request.user.username)
+    audioSample = AudioSample.objects.filter(customer=request.user)
+    print(audioSample)
     active_subscription = Subscription.objects.filter(customer=customer, status=True).first()
 
     char_limit = 500  # Mặc định cho gói Free
@@ -75,9 +190,8 @@ def get_index(request):
         'package': {'name': active_package_name, 'start': active_package_start_date, 'end': active_package_end_date}, 
         'char_limit': char_limit, 
         'loc': loc,
-        # 'media_url': media_url
+        'audioSample': audioSample
     })
-
 
 def get_private_audio(request):
     customer = Customer.objects.get(username=request.user.username)
@@ -95,19 +209,22 @@ def get_private_audio(request):
         spl = request.GET.get('spl', '/content/model/samples/nu-luu-loat.wav')
         isDownload = request.GET.get('isDownload', "false")
 
-        # Gọi API của Gradio để tạo âm thanh
-        client = Client("https://ba77c12450ab7c6667.gradio.live/")
         result = client.predict(
-            prompt=text,
-            language=lang,
-            audio_file_pth=spl,  # Chọn giọng mẫu
-            normalize_text=True,
-            target_language=tdl if tdl != "None" else None,
-            api_name="/predict"
+		prompt=text,
+		language=lang,
+		audio_file_pth=spl, # tạo list
+		normalize_text=True,
+		target_language=tdl if tdl != "None" else None,   # đoạn này trong html thì tạo check list các support language cho user
+  		username= customer.username,
+		api_name="/predict",
+  
         )
-
         audio_path = result[0]  # API trả về đường dẫn file âm thanh từ Gradio
+        time_match = re.search(r"Time to generate audio: (\d+) milliseconds", result[1])
+        rtf_match = re.search(r"Real-time factor \(RTF\): ([\d.]+)", result[1])
 
+        if time_match and rtf_match:
+            duration = round(int(time_match.group(1)) / 1000/float(rtf_match.group(1)),2)
         # Đọc file âm thanh từ Gradio
         try:
             with open(audio_path, "rb") as f:
@@ -115,14 +232,6 @@ def get_private_audio(request):
         except Exception as e:
             return HttpResponse(f"Lỗi khi đọc file âm thanh: {str(e)}", status=500)
 
-        # Tính thời lượng file
-        my_buffer = io.BytesIO(audio_data)
-        my_buffer.seek(0)
-        try:
-            audio = MP3(my_buffer)
-            duration = round(audio.info.length, 2)
-        except Exception:
-            duration = None
 
         # Lưu lịch sử nếu không phải chế độ tải xuống
         if isDownload == "false":
@@ -144,9 +253,7 @@ def get_private_audio(request):
         response = HttpResponse(audio_data, content_type="audio/mpeg")
         response['Content-Disposition'] = f'attachment; filename={file_name}'
         return response
-
     
-
 # Create your views here.
 class CustomPasswordResetView(PasswordResetView):
     form_class = CustomPasswordResetForm

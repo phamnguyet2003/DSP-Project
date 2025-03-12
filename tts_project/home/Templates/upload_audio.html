@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load static %}
+{% block main-content %}
+<main class="main d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-5">
+          <h3 class="text-center">Tải giọng bạn muốn lên:</h3>
+          <form method="post" enctype="multipart/form-data" class="p-4 border rounded shadow-sm bg-light">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+              <label for="audioname" class="form-label fw-bold">Tên file âm thanh:</label>
+              <input type="text" id="audioname" name="audioname" class="form-control" required>
+            </div>
+  
+            <div class="mb-3">
+              <label for="file" class="form-label fw-bold">Chọn file từ máy:</label>
+              <input type="file" id="file" name="file" class="form-control" accept="audio/*" required>
+            </div>
+  
+            <div class="text-center">
+              <button type="submit" class="btn btn-success w-100">Tải lên</button>
+            </div>
+          </form>
+  
+          {% if message %}
+            <p class="text-success text-center mt-3">{{ message }}</p>
+          {% endif %}
+          {% if error %}
+            <p class="text-danger text-center mt-3">{{ error }}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </main>
+  
+<p id="message" style="color: green;"></p>
+<p id="error" style="color: red;"></p>
+
+<script>
+document.getElementById("upload-form").addEventListener("submit", function(event) {
+    event.preventDefault(); // Ngăn form submit mặc định
+
+    let formData = new FormData(this);
+
+    fetch("{% url 'upload_audio' %}", {
+        method: "POST",
+        body: formData,
+        headers: {
+            "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "success") {
+            document.getElementById("message").innerText = data.message;
+            document.getElementById("error").innerText = "";
+        } else {
+            document.getElementById("error").innerText = data.error;
+            document.getElementById("message").innerText = "";
+        }
+    })
+    .catch(error => {
+        document.getElementById("error").innerText = "Có lỗi xảy ra!";
+        console.error("Error:", error);
+    });
+});
+</script>
+{% endblock %} 

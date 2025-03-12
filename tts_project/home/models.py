@@ -100,3 +100,14 @@ class PageView(models.Model):
     count = models.IntegerField(default=0)
     def __str__(self):
         return f"{self.date}"
+    
+# AudioSample model
+class AudioSample(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='audio_samples')
+    audioname = models.CharField(max_length=255)  # Tên file âm thanh
+    audio_data = models.BinaryField()  # Dữ liệu âm thanh nhị phân
+    created_at = models.DateTimeField(auto_now_add=True)
+    gradioname = models.CharField(max_length=255, blank=True, null=True)  # Tên file âm thanh
+
+    def __str__(self):
+        return f"{self.audioname} by {self.customer.username}"
