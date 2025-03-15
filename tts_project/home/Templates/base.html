@@ -49,6 +49,7 @@
           {% comment %} <li><a href="{% url 'profile' %}" class="{% if request.path == '/profile/' %}active{% endif %}">Người dùng</a></li> {% endcomment %}
           {% comment %} <li><a href="{% url 'profile' %}" class="{% if request.path == '/profile/' %}active{% endif %}">Người dùng</a></li> {% endcomment %}
           <li><a href="{% url 'money' %}" class="{% if request.path == '/money/' %}active{% endif %}">Nạp tiền</a></li>
+          <li><a href="{% url 'donation_list' %}" class="{% if request.path == '/donation_list/' %}active{% endif %}">Ủng hộ</a></li>
           {% comment %} <li><a href="support.html">Hỗ trợ</a></li> {% endcomment %}
           <li class="dropdown"><a href="#"><span>Hỗ trợ</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
