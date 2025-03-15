@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block main-content %}
+
+{% if messages %}
+<div class="container mt-3">
+    {% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="container my-3 p-3">
+    <div class="row justify-content-center">
+        <!-- Phần Donate (1/3 màn hình) -->
+        <div class="col-lg-4">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header text-center" style="margin-bottom: -10px;">
+                    <h3 class="font-weight-light my-1">❤️ Donate ngay!</h3>
+                </div>
+                <div class="card-body text-center">
+                    <form method="POST" action="{% url 'donate' %}">
+                        {% csrf_token %}
+                        <p><strong>Chọn số tiền:</strong></p>
+                        <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
+                            <button type="button" class="money-btn btn btn-warning" data-value="10000" onclick="selectAmount(10000)">10,000 VNĐ</button>
+                            <button type="button" class="money-btn btn btn-warning" data-value="20000" onclick="selectAmount(20000)">20,000 VNĐ</button>
+                            <button type="button" class="money-btn btn btn-warning" data-value="50000" onclick="selectAmount(50000)">50,000 VNĐ</button>
+                            <button type="button" class="money-btn btn btn-warning" data-value="100000" onclick="selectAmount(100000)">100,000 VNĐ</button>
+                            <button type="button" class="money-btn btn btn-warning" data-value="200000" onclick="selectAmount(200000)">200,000 VNĐ</button>
+                            <button type="button" class="money-btn btn btn-warning" data-value="500000" onclick="selectAmount(500000)">500,000 VNĐ</button>
+                        </div>
+                        <input type="hidden" id="amount" name="amount" required>
+                        <div class="form-group">
+                            <label for="message">Lời nhắn:</label>
+                            <input type="text" name="message" class="form-control" placeholder="Cảm ơn bạn!">
+                        </div>
+                        <button type="submit" class="btn btn-success mt-2" style="transition: background-color 0.3s ease;">💖 Donate ngay!</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Lịch sử donate của user -->
+            <div class="card shadow-lg border-0 rounded-lg mt-4">
+                <div class="card-header text-center" style="margin-bottom: -10px;">
+                    <h4 class="font-weight-light my-1">📜 Lịch sử donate của bạn</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Số tiền</th>
+                                <th>Lời nhắn</th>
+                                <th>Thời gian</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for donation in user_donations %}
+                                <tr>
+                                    <td>{{ donation.amount }}</td>
+                                    <td>{{ donation.message|default:"Không có" }}</td>
+                                    <td>{{ donation.created_at }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">Bạn chưa donate lần nào.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bảng donate tổng thể (2/3 màn hình) -->
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 rounded-lg mt-4">
+                <div class="card-header text-center">
+                    <h3 class="font-weight-light my-1">Bảng đóng góp</h3>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Người ủng hộ</th>
+                                <th>Số tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for donation in donations %}
+                                <tr>
+                                    <td>{{ donation.customer__name }}</td>
+                                    <td>{{ donation.total_amount }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">Chưa có donation nào.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn-success:hover {
+        background-color: #218838;
+    }
+    .money-btn.active {
+        background-color: #ffc107;
+        color: #000;
+        font-weight: bold;
+    }
+</style>
+
+<script>
+    
+    function selectAmount(value) {
+        document.getElementById('amount').value = value;
+        document.querySelectorAll('.money-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`[data-value="${value}"]`).classList.add('active');
+    }
+
+</script>
+
+{% endblock %}

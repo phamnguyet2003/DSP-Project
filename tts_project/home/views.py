@@ -9,7 +9,7 @@ from .models import *
 from datetime import timedelta
 # from django.core.cache import cache
 from django.contrib.auth import logout
-from django.db.models import Q
+from django.db.models import Q, Sum
 import os
 import re
 import datetime
@@ -146,14 +146,13 @@ def send_audio_to_gradio(request):
         return JsonResponse({"error": str(e)}, status=500)
     
 ###########################
-
+#  Trang trải nghiệm
 def get_index(request):
     if not request.user.is_authenticated:
         return redirect('login')
 
     customer = Customer.objects.get(username=request.user.username)
     audioSample = AudioSample.objects.filter(customer=request.user)
-    print(audioSample)
     active_subscription = Subscription.objects.filter(customer=customer, status=True).first()
 
     char_limit = 500  # Mặc định cho gói Free
@@ -254,6 +253,42 @@ def get_private_audio(request):
         response['Content-Disposition'] = f'attachment; filename={file_name}'
         return response
     
+#####################################
+# Bảng donation
+def donation_list(request):
+    if not request.user.is_authenticated:
+        return redirect('login')  # Hoặc trang đăng nhập của bạn
+    username = request.user.name
+    money = request.user.money
+    
+    """Hiển thị danh sách donation"""
+    # donations = Donation.objects.order_by('-created_at')  # Sắp xếp mới nhất lên đầu
+    donations = Donation.objects.values('customer__name').annotate(total_amount=Sum('amount')).order_by('-total_amount')
+    user_donations = Donation.objects.filter(customer=request.user).order_by('-created_at')  # Lịch sử của user
+    return render(request, 'donation_list.html', {'donations': donations, 'user_donations': user_donations, 'username':username, 'customer_value': money})
+
+def donate(request):
+    if request.method == "POST":
+        amount = request.POST.get('amount')
+        message = request.POST.get('message', '')
+        
+        try:
+            amount = float(amount)
+            if amount <= 0:
+                raise ValueError("Số tiền phải lớn hơn 0")
+
+            # Lưu donation, trừ tiền sẽ được xử lý trong model
+            donation = Donation.objects.create(customer=request.user, amount=amount, message=message)
+            messages.success(request, f"Cảm ơn bạn đã donate {amount} VNĐ! Lời nhắn: {message}")
+
+        except ValueError as e:
+            messages.error(request, f"Lỗi: {e}")
+        except Exception as e:
+            messages.error(request, "Có lỗi xảy ra!")
+
+        return redirect('donation_list')
+
+#####################################
 # Create your views here.
 class CustomPasswordResetView(PasswordResetView):
     form_class = CustomPasswordResetForm

@@ -111,3 +111,23 @@ class AudioSample(models.Model):
 
     def __str__(self):
         return f"{self.audioname} by {self.customer.username}"
+    
+#  Bảng donate
+class Donation(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)  # Số tiền donate
+    message = models.TextField(blank=True, null=True)  # Tin nhắn từ người donate
+    created_at = models.DateTimeField(auto_now_add=True)  # Thời gian donate
+
+    def save(self, *args, **kwargs):
+        """Trừ tiền từ tài khoản của user khi donate"""
+        if self.pk is None:  # Chỉ trừ tiền khi tạo mới
+            if self.customer.money >= self.amount:
+                self.customer.money -= self.amount
+                self.customer.save()
+            else:
+                raise ValueError("Số dư không đủ để donate!")
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Donation {self.amount} by {self.customer.username}"

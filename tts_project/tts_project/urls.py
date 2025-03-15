@@ -39,6 +39,9 @@ urlpatterns = [
     path("payments/", views.get_payments, name='payments'),
     path('buy_package/', views.buy_package, name='buy_package'),
     
+    path('donation_list/', views.donation_list, name='donation_list'),
+    path('donate/', views.donate, name='donate'),
+    
     path("profile/", views.get_profile, name='profile'),
     path('edit_profile/', views.edit_profile, name='edit_profile'),
     

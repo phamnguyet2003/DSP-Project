@@ -6,13 +6,13 @@ from .models import Wallet, Customer
 
 class WalletAdmin(admin.ModelAdmin):
     list_display = ('customer', 'transaction_date', 'value')  # Hiển thị cột trong bảng admin
-    search_fields = ['customer__name']  # Cho phép tìm kiếm theo tên khách hàng
+    search_fields = ['customer__username']  # Cho phép tìm kiếm theo tên khách hàng
     autocomplete_fields = ['customer']  # Bật tính năng autocomplete
 
 admin.site.register(Wallet, WalletAdmin)
 
 class CustomerAdmin(admin.ModelAdmin):
-    search_fields = ['name', 'email', 'phone']  # Cho phép tìm kiếm theo tên, email, số điện thoại
+    search_fields = ['username', 'email', 'phone']  # Cho phép tìm kiếm theo tên, email, số điện thoại
 
 admin.site.register(Customer, CustomerAdmin)
 
@@ -24,3 +24,4 @@ admin.site.register(Payment)
 admin.site.register(History)
 admin.site.register(PageView)
 admin.site.register(AudioSample)
+admin.site.register(Donation)
